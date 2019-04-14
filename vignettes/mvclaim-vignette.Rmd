@@ -1,0 +1,78 @@
+---
+title: "Bivariate gamma mixture of experts models"
+author: "Sen Hu"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Bivariate gamma mixture of experts models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The `mvClaim` package provides a flexible modelling framework of mixture of experts (MoE) using bivariate gamma distributions, as introduced in Hu et al. (2019).
+It implements the bivariate gamma distribution proposed by Cheriyan (1941) and Ramabhadran (1951), which has not received much attention in the past. 
+Depends on the parameterization of the framework, its interpretation, and model parsimony issue, a family of models are implemented including: 
+
+* Bivariate gamma distribution estimation
+* Bivariate gamma regression
+* Mixture of bivariate gamma clustering
+* Mixture of bivariate gamma regressions (i.e. mixture of bivariate gamma clustering with covariates)
+
+
+In this documents we illustrate two examples of bivariate gamma mixture of experts (MoE) models with two artificually simulated data sets, as well as illustrating some main functions in the `mvClaim` package. 
+
+
+## Example 1
+
+
+
+
+
+
+
+## Example 2
+
+## Styles
+
+The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+
+    output: 
+      rmarkdown::html_vignette:
+        css: mystyles.css
+
+## Figures
+
+The figure sizes have been customised so that you can easily put two images side-by-side. 
+
+```{r, fig.show='hold'}
+plot(1:10)
+plot(10:1)
+```
+
+You can enable figure captions by `fig_caption: yes` in YAML:
+
+    output:
+      rmarkdown::html_vignette:
+        fig_caption: yes
+
+Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+
+## More Examples
+
+You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(mtcars, 10))
+```
+
+Also a quote using `>`:
+
+> "He who gives up [code] safety for [code] speed deserves neither."
+([via](https://twitter.com/hadleywickham/status/504368538874703872))

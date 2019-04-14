@@ -9,6 +9,13 @@ License: GPL-2
 Encoding: UTF-8
 LazyData: true
 Imports: 
-  nnets, stats
+    nnets,
+    stats,
+    MASS,
+    distrEx
 Suggests:
-  mclust
+    mclust,
+    knitr,
+    rmarkdown,
+    MoEClust
+VignetteBuilder: knitr

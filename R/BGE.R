@@ -104,7 +104,7 @@ BGE <- function(data,
     alpha1.rootfun <- function(alpha1.var){
       log(beta.new)*n - digamma(alpha1.var)*n + sum(Expected.logx1)
     }
-    alpha1.new <- uniroot(alpha1.rootfun,
+    alpha1.new <- stats::uniroot(alpha1.rootfun,
                           lower=sqrt(.Machine$double.eps),
                           upper=100000,
                           tol = sqrt(.Machine$double.xmin),
@@ -112,7 +112,7 @@ BGE <- function(data,
     alpha2.rootfun <- function(alpha2.var){
       log(beta.new)*n - digamma(alpha2.var)*n + sum(Expected.logx2)
     }
-    alpha2.new <- uniroot(alpha2.rootfun,
+    alpha2.new <- stats::uniroot(alpha2.rootfun,
                           lower=sqrt(.Machine$double.eps),
                           upper=100000,
                           tol = sqrt(.Machine$double.xmin),
@@ -120,7 +120,7 @@ BGE <- function(data,
     alpha3.rootfun <- function(alpha3.var){
       log(beta.new)*n - digamma(alpha3.var)*n + sum(Expected.logx3)
     }
-    alpha3.new <- uniroot(alpha3.rootfun,
+    alpha3.new <- stats::uniroot(alpha3.rootfun,
                           lower=sqrt(.Machine$double.eps),
                           upper=100000,
                           tol=sqrt(.Machine$double.xmin),
