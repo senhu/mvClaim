@@ -1,5 +1,5 @@
 #' Multivariate Poisson distribution estimation
-#' 
+#'
 
 bvpe <- function(data, method="EM", verbose=TRUE, tol=1e-6){
   n <- dim(data)[1]
@@ -19,7 +19,7 @@ bvpe <- function(data, method="EM", verbose=TRUE, tol=1e-6){
   den <- rep(0, n)
   s<-rep(0, n)
   while ( (loglike.diff > tol) && (iter <= maxit) ){
-    
+
     for (i in 1:n) {
       den[i] <- dbivpois(c(y1[i],y2[i]),
                          lambda=c(lambda1,lambda2,lambda3),
@@ -33,11 +33,11 @@ bvpe <- function(data, method="EM", verbose=TRUE, tol=1e-6){
         if (is.nan(s[i]) || is.na(s[i])){s[i, g]<-0}
       }
     }
-    
+
     lambda1 <- sum(y1-s)/n
     lambda2 <- sum(y2-s)/n
     lambda3 <- sum(s)/n
-    
+
     loglike.new <- sum(den)
     loglikelihood[iter] <- loglike.new
     loglike.diff <- abs( loglike.new - loglike.current ) / (1+abs(loglike.new))
@@ -49,5 +49,3 @@ bvpe <- function(data, method="EM", verbose=TRUE, tol=1e-6){
   }
   return(parameter=c(lambda1, lambda2, lambda3))
 }
-bvpe(data)
-dim(data)

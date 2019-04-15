@@ -1,7 +1,7 @@
 Package: mvClaim
 Title: Mixture of experts models with bivariate gamma and bivariate Poisson distributions 
 Version: 0.1.0
-Authors@R: Sen Hu("Sen", "Hu", email = "ethansen.hu@gmail.com", role = c("aut", "cre"))
+Authors@R: person("Sen", "Hu", email = "ethansen.hu@gmail.com", role = c("aut", "cre"))
 Maintainer: Sen Hu <ethansen.hu@gmail.com>
 Description: Use bivariate gamma and bivariate Poisson mixture of experts models to cluster and predict insurance claims data.
 Depends: R (>= 3.3.2)
@@ -9,7 +9,7 @@ License: GPL-2
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    nnets,
+    nnet,
     stats,
     MASS,
     distrEx
@@ -19,3 +19,4 @@ Suggests:
     rmarkdown,
     MoEClust
 VignetteBuilder: knitr
+RoxygenNote: 6.1.1

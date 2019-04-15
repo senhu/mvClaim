@@ -1,3 +1,16 @@
+#' Random generation for the bivariate gamma distribution
+#'
+#' This function allows you to generate random bivariate gamma variables given the distribution parameters
+#' @param n number of observations.
+#' @param alpha the shape parameters of the bivariate gamma distribution. Must be a vector of length 3 represent alpha 1, alpha 2 and alpha 3 respectively.
+#' @param beta the rate parameter of the bivariate gamma distribution.
+#'
+#' @return random deviates of length n
+#'
+#' @example
+#' plot(rbivgamma(2000, alpha=c(1,1,1), beta=1))
+#' plot(rbivgamma(2000, c(0.5, 0.5, 0.2),beta=0.001))
+
 rbivgamma <- function(n, alpha, beta){
   alpha1 <- alpha[1]
   alpha2 <- alpha[2]
@@ -10,8 +23,4 @@ rbivgamma <- function(n, alpha, beta){
 }
 
 
-#haha1 <- rbivgamma(2000, c(1,1,1),beta=1)
-#plot(haha1)
-# haha2 <- rbivgamma(2000, c(0.5406931,0.5399668,0.2699834),beta=0.002210341)
-# plot(rbind(haha1, haha2))
-# plot(data)
+
