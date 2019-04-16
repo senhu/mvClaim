@@ -372,7 +372,10 @@ BGR.EE <- function(data,
   l3.formula <- formula(paste("", as.character(l3.new)[3], sep="~"))
   l4.formula <- formula(paste("", as.character(l4.new)[3], sep="~"))
 
-  result<-list(coef        =list(coef1.new, coef2.new, coef3.new),
+  result<-list(coef        =list(l1.coef=coef1.new,
+                                 l2.coef=coef2.new,
+                                 l3.coef=coef3.new,
+                                 l4.coef=coef4.new),
                alpha1      =alpha1.current,
                alpha2      =alpha2.current,
                alpha3      =alpha3.current,
@@ -643,7 +646,9 @@ BGR.EI <- function(data,
   l2.formula <- formula(paste("", as.character(l2.new)[3], sep="~"))
   l3.formula <- formula(paste("", as.character(l3.new)[3], sep="~"))
 
-  result<-list(coef        =list(coef1.new, coef2.new, coef3.new),
+  result<-list(coef        =list(l1.coef=coef1.new,
+                                 l2.coef=coef2.new,
+                                 l3.coef=coef3.new),
                alpha1      =alpha1.current,
                alpha2      =alpha2.current,
                alpha3      =alpha3.current,
@@ -874,7 +879,7 @@ BGR.IE <- function(data,
   # formula
   l4.formula <- formula(paste("", as.character(l4.new)[3], sep="~"))
 
-  result<-list(coef        =coef4.new,
+  result<-list(coef        =list(l4.coef=coef4.new),
                alpha1      =alpha1.current,
                alpha2      =alpha2.current,
                alpha3      =alpha3.current,
