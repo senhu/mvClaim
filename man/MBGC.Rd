@@ -22,9 +22,9 @@ MBGC(modelName = c("CC", "CI", "IC"), y, G, gating, data, maxit = 100,
 
 \item{tol}{A parameter that controls the convergence tolerance in the EM algorithm. The default is 1e-5.}
 
-\item{verbose}{A logical controlling whether estimations in each EM iteration are shown in the fitting process. The default is TRUE.}
+\item{initialization}{Specifies initialization method for EM algorithm. The default is "\code{mclust}".}
 
-\item{Aitken}{A parameter that contols whether Aitken acceleration is used.}
+\item{verbose}{A logical controlling whether estimations in each EM iteration are shown in the fitting process. The default is TRUE.}
 }
 \value{
 An object of class \code{MBGC} providing the estimation results.
@@ -58,6 +58,8 @@ An object of class \code{MBGC} providing the estimation results.
 Estimation using EM algorithm for mixture of bivariate gamma distributions
 }
 \examples{
+
+\donttest{
 clust1 <- MBGC(modelName = "CC", y=c("y1","y2"),
                G=2, gating = "C", data=gatingsim, verbose=FALSE)
 clust1
@@ -76,4 +78,6 @@ clust5
 clust6 <- MBGC(modelName = "IC", y=c("y1","y2"),
                G=2, gating = ~w1+w2+w3, data=gatingsim)
 clust6
+}
+
 }

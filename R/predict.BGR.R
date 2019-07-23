@@ -15,6 +15,8 @@
 #'   \item{tau.fit}{predicted mixing proportion values, if covariates enter the gating network.}
 #'
 #' @examples
+#'
+#' \donttest{
 #' mod1 <- BGR(modelName = "EE",
 #'             y = c("y1","y2"), data = fullsim,
 #'             f1 = ~ w1 + w2,
@@ -23,6 +25,8 @@
 #'             f4 = ~ w1 + w2 + w3,
 #'             verbose= FALSE)
 #' fitted1 <- predict(mod1, newdata=fullsim)
+#' plot(fitted1$fit)
+#'
 #' mod2 <- BGR(modelName = "EI",
 #'             y = c("y1","y2"), data = fullsim,
 #'             f1     = ~ w1 + w2,
@@ -35,27 +39,29 @@
 #'             f4     = ~ w1 + w2 + w3,
 #'             verbose= FALSE)
 #' fitted3 <- predict(mod3, newdata=fullsim)
-#' plot(fitted1$fit)
 #' plot(fitted2$fit)
 #' plot(fitted3$fit)
+#' }
+#'
+#' @export
 
 predict.BGR <- function(object, newdata, ...){
   modelName <- object$modelName
   switch(modelName,
          EE = {    # BGR.EE: all alpha's and beta are regressed on covariates
-           return(predict.BGR.EE(object=object, newdata=newdata, ...))
+           return(predict_BGR_EE(object=object, newdata=newdata, ...))
          },
          EI = {    # BGR.EI: same beta for all observations
-           return(predict.BGR.EI(object=object, newdata=newdata, ...))
+           return(predict_BGR_EI(object=object, newdata=newdata, ...))
          },
          IE = {# BGR.IE: only beta is regressed on its covariates, not alpha
-           return(predict.BGR.IE(object=object, newdata=newdata, ...))
+           return(predict_BGR_IE(object=object, newdata=newdata, ...))
          },
          stop("invalid model type name")
   )
 }
 
-predict.BGR.EE <- function(object, newdata, ...){
+predict_BGR_EE <- function(object, newdata, ...){
 
   l1.n    <- object$formula[[1]]
   matrix1 <- as.matrix(stats::model.matrix(l1.n, data=newdata))
@@ -83,7 +89,7 @@ predict.BGR.EE <- function(object, newdata, ...){
   return(result)
 }
 
-predict.BGR.EI <- function(object, newdata, ...){
+predict_BGR_EI <- function(object, newdata, ...){
 
   l1.n    <- object$formula[[1]]
   matrix1 <- as.matrix(stats::model.matrix(l1.n, data=newdata))
@@ -109,7 +115,7 @@ predict.BGR.EI <- function(object, newdata, ...){
   return(result)
 }
 
-predict.BGR.IE <- function(object, newdata, ...){
+predict_BGR_IE <- function(object, newdata, ...){
   l4.n    <- object$formula
   matrix4 <- as.matrix(stats::model.matrix(l4.n, data=newdata))
   a1 <- object$alpha1

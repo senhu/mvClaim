@@ -22,6 +22,8 @@
 Summary method for class "\code{BGR}"
 }
 \examples{
+
+\donttest{
 mod <- BGR(modelName = "EE",
            y=c("y1","y2"),
            data   = fullsim,
@@ -31,4 +33,6 @@ mod <- BGR(modelName = "EE",
            f4     = ~ w1 + w2 + w3,
            verbose= FALSE)
 summary(mod)
+}
+
 }

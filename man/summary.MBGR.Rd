@@ -22,6 +22,8 @@
 Summary method for class "\code{MBGR}"
 }
 \examples{
+
+\donttest{
 mod <- MBGR(modelName = "CE",
             y=c("y1","y2"),
             data   = fullsim,
@@ -32,4 +34,6 @@ mod <- MBGR(modelName = "CE",
             f4     = ~ w1 + w2 + w3,
             gating = "C")
 summary(mod)
+}
+
 }

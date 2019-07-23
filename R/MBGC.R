@@ -9,7 +9,7 @@
 #' @param data A matrix or data frame of observations. Categorical variables are allowed as covariates.
 #' @param maxit A parameter that controls the number of maximum iteration in the EM algorithm. The default is 100.
 #' @param tol A parameter that controls the convergence tolerance in the EM algorithm. The default is 1e-5.
-#' @param Aitken A parameter that contols whether Aitken acceleration is used.
+#' @param initialization Specifies initialization method for EM algorithm. The default is "\code{mclust}".
 #' @param verbose A logical controlling whether estimations in each EM iteration are shown in the fitting process. The default is TRUE.
 #'
 #' @return An object of class \code{MBGC} providing the estimation results.
@@ -40,6 +40,8 @@
 #'   \item{trace}{All estimated coefficients and alpha, beta values in the EM algorithm.}
 #'
 #' @examples
+#'
+#' \donttest{
 #' clust1 <- MBGC(modelName = "CC", y=c("y1","y2"),
 #'                G=2, gating = "C", data=gatingsim, verbose=FALSE)
 #' clust1
@@ -58,7 +60,10 @@
 #' clust6 <- MBGC(modelName = "IC", y=c("y1","y2"),
 #'                G=2, gating = ~w1+w2+w3, data=gatingsim)
 #' clust6
-
+#' }
+#'
+#' @importFrom stats uniroot Gamma formula coef optimHess
+#' @export
 
 MBGC <- function(modelName = c("CC","CI","IC"),
                  y,
@@ -71,23 +76,25 @@ MBGC <- function(modelName = c("CC","CI","IC"),
                  verbose = TRUE){
   switch(modelName,
          CC = {
-           res <- MBGC.CC(y=y, G=G, gating=gating, data=data,
+           res <- MBGC_CC(y=y, G=G, gating=gating, data=data,
                           maxit=maxit, tol=tol, initialization=initialization,
                           verbose=verbose)
          },
          CI = {
-           res <- MBGC.CI(y=y, G=G, gating=gating, data= data,
+           res <- MBGC_CI(y=y, G=G, gating=gating, data= data,
                           maxit=maxit, tol=tol, initialization=initialization,
                           verbose=verbose)
          },
          IC = {
-           res <- MBGC.IC(y=y, G=G, gating=gating, data=data,
+           res <- MBGC_IC(y=y, G=G, gating=gating, data=data,
                           maxit=maxit, tol=tol, initialization=initialization,
                           verbose=verbose)
          },
          stop("invalid model type name") )
   return(res)
 }
+
+#' @export
 
 print.MBGC <- function (x, ...){
   modelfullname <- paste0(x$gating, x$modelName, collapse="")
@@ -101,7 +108,7 @@ print.MBGC <- function (x, ...){
 
 # #' @rdname MBGC
 
-MBGC.CC <- function(y,
+MBGC_CC <- function(y,
                     G,
                     gating, # "C", "E", formula
                     data,
@@ -189,7 +196,7 @@ MBGC.CC <- function(y,
 
     for (i in seq_len(n)){
       for (g in seq_len(G)){
-        expected.latent.res  <- expected.latent(c(y1[i],y2[i]),
+        expected.latent.res  <- expected_latent(c(y1[i],y2[i]),
                                                 alpha=c(alpha1.current[g],
                                                         alpha2.current[g],
                                                         alpha3.current[g]),
@@ -381,7 +388,7 @@ MBGC.CC <- function(y,
 
 # #' @rdname MBGC
 
-MBGC.CI <- function(y,
+MBGC_CI <- function(y,
                     G,
                     gating, # "C", "E", formula
                     data,
@@ -468,7 +475,7 @@ MBGC.CI <- function(y,
     den            <- matrix(0,nrow=n, ncol=G)
     for (i in seq_len(n)){
       for (g in seq_len(G)){
-        expected.latent.res  <- expected.latent(c(y1[i],y2[i]),
+        expected.latent.res  <- expected_latent(c(y1[i],y2[i]),
                                                 alpha=c(alpha1.current[g],
                                                         alpha2.current[g],
                                                         alpha3.current[g]),
@@ -655,7 +662,7 @@ MBGC.CI <- function(y,
 
 # #' @rdname MBGC
 
-MBGC.IC <- function(y,
+MBGC_IC <- function(y,
                     G,
                     gating, # "C", "E", formula
                     data,
@@ -745,7 +752,7 @@ MBGC.IC <- function(y,
 
     for (i in seq_len(n)){
       for (g in seq_len(G)){
-        expected.latent.res  <- expected.latent(c(y1[i],y2[i]),
+        expected.latent.res  <- expected_latent(c(y1[i],y2[i]),
                                                 alpha=c(alpha1.current,
                                                         alpha2.current,
                                                         alpha3.current),

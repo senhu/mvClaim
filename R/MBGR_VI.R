@@ -1,14 +1,14 @@
 #-------------------------------------
-# Method 9: CEC / EEC / VEC
+# Method 5: CVI / VVI / EVI
 #--------------------------------------
 
-MBGR.EC <- function(y,
+MBGR_VI <- function(y,
                     data,
                     G,
                     f1,
                     f2,
                     f3,
-                    gating ,
+                    gating,
                     initialization = "mclust",
                     maxit   = 200,
                     tol     = 1e-5,
@@ -25,31 +25,30 @@ MBGR.EC <- function(y,
                                             maxit  = maxit,
                                             tol    = tol,
                                             verbose= verbose)))
-
   namey1 <- y[1]
   namey2 <- y[2]
   y1     <- data[,names(data)==namey1]
   y2     <- data[,names(data)==namey2]
   n      <- length(y1)
 
-  newdata<-data
-  newdata<-newdata[ , names(newdata)!=namey1]
+  newdata<-data;
+  newdata<-newdata[ , names(newdata)!=namey1];
   newdata<-newdata[ , names(newdata)!=namey2]
 
   if (!is.null(f1) && class(f1)=="formula"){
     if (as.character(f1[2])=="."){
       f1.new <- formula( paste( "x1", paste( names(newdata),'',collapse='+',sep='' ), sep='~'))
     } else {f1.new <- formula(paste("x1", as.character(f1)[2], sep="~"))}
-  } else {stop("f1 cannot be NULL or has to be a formula.")}
+  } else {stop("f1 cannot not be NULL and has to be a formula")}
   if (!is.null(f2) && class(f2)=="formula"){
     if (as.character(f2[2])=="."){f2.new <- formula( paste( "x2", paste( names(newdata),'',collapse='+',sep='' ), sep='~'))}
     else {f2.new <- formula(paste("x2", as.character(f2)[2], sep="~"))}
-  } else {stop("f2 cannot be NULL or has to be a formula.")}
+  } else {stop("f2 cannot not be NULL and has to be a formula")}
   if (!is.null(f3) && class(f3)=="formula"){
     if (as.character(f3[2])=="."){f3.new <- formula( paste( "x3", paste( names(newdata), "", collapse = "+", sep = ""), sep="~"))}
     else {f3.new <- formula(paste("x3", as.character(f3)[2], sep="~"))}
-  } else {stop("f3 cannot be NULL or has to be a formula.")}
-  if (gating!="C" && gating != "E"){
+  } else {stop("f3 cannot not be NULL and has to be a formula")}
+  if (gating != "C" && gating != "E"){
     if (as.character(gating[2])=="."){gating.new <- formula( paste( "pzy", paste( names(newdata), "", collapse = "+", sep = ""), sep="~"))}
     else {gating.new <- formula(paste("pzy", as.character(gating)[2], sep="~"))}
   }
@@ -63,7 +62,7 @@ MBGR.EC <- function(y,
 
   if (initialization == "mclust"){
     initial.mclust <- mclust::Mclust(G=G, data = cbind(y1,y2), verbose = FALSE)
-    z.init         <- initial.mclust$z
+    z.init      <- initial.mclust$z
 
     if (gating == "C"){
       p.z.current        <- initial.mclust$parameters$pro
@@ -82,7 +81,6 @@ MBGR.EC <- function(y,
     alpha1.current <- matrix(0,ncol=G, nrow=n)
     alpha2.current <- matrix(0,ncol=G, nrow=n)
     alpha3.current <- matrix(0,ncol=G, nrow=n)
-    beta.current   <- rep(0,G)
 
     x3 <- rep(0, n)
     for (i in seq_len(n)){ x3[i] <- runif(1, min=0, max=min(y1[i], y2[i])) }
@@ -112,14 +110,8 @@ MBGR.EC <- function(y,
       alpha1.current[,gg] <- rep(1/summary(start.temp.glm.1)$dispersion, n)
       alpha2.current[,gg] <- rep(1/summary(start.temp.glm.2)$dispersion, n)
       alpha3.current[,gg] <- rep(1/summary(start.temp.glm.3)$dispersion, n)
-      beta.current[gg]    <- sum( z.init[,gg]*(alpha1.current[,gg]+alpha2.current[,gg]+alpha3.current[,gg]) ) / sum( z.init[,gg]*(x1+x2+x3) )
     }
-    alpha1.current <- rowMeans(alpha1.current)
-    alpha2.current <- rowMeans(alpha2.current)
-    alpha3.current <- rowMeans(alpha3.current)
-    coef1.current  <- rowMeans(coef1.current)
-    coef2.current  <- rowMeans(coef2.current)
-    coef3.current  <- rowMeans(coef3.current)
+    beta.current          <- sum( z.init*(alpha1.current+alpha2.current+alpha3.current) ) / sum( z.init * rep_col(x1+x2+x3, G) )
   }
 
   loglike.diff    <- 1000
@@ -137,11 +129,12 @@ MBGR.EC <- function(y,
     Expected.logx2 <- matrix(0,nrow=n, ncol=G)
     Expected.logx3 <- matrix(0,nrow=n, ncol=G)
     den            <- matrix(0,nrow=n, ncol=G)
+
     for (i in seq_len(n)){
       for (g in seq_len(G)){
-        expected.latent.res  <- expected.latent(c(y1[i],y2[i]),
-                                                alpha=c(alpha1.current[i],alpha2.current[i],alpha3.current[i]),
-                                                beta=beta.current[g])
+        expected.latent.res  <- expected_latent(c(y1[i],y2[i]),
+                                                alpha=c(alpha1.current[i,g],alpha2.current[i,g],alpha3.current[i,g]),
+                                                beta=beta.current)
         Expected.x3[i,g]     <- expected.latent.res$Expected.s
         Expected.x1[i,g]     <- (y1[i]-expected.latent.res$Expected.s)
         Expected.x2[i,g]     <- (y2[i]-expected.latent.res$Expected.s)
@@ -181,71 +174,79 @@ MBGR.EC <- function(y,
         coef.p.new   <- NULL
         mp           <- NULL } else {
           newdata$pzy  <- z.new
-          mp         <- nnet::multinom(formula = gating.new, data = newdata, trace=FALSE)
+          mp         <- nnet::multinom(formula = gating.new, data = newdata, trace=FALSE)  # reltol
           coef.p.new <- coef(mp)
           p.z.new    <- stats::predict(mp, type="probs") }
 
-    beta.new   <- rep(0, G)
-    Q.function <- function(coef, Model.Matrix, Expected.log.value, z.mat){
-      q.res <- sum(rowSums(z.mat * rep.row(log(beta.current), n)) * exp(coef%*%t(Model.Matrix))) -
-                sum( rowSums(z.mat) * lgamma(exp(coef%*%t(Model.Matrix))) ) +
-                sum( rowSums(z.mat * Expected.log.value) * exp(coef%*%t(Model.Matrix)) )
+    coef1.new  <- coef1.current
+    coef2.new  <- coef2.current
+    coef3.new  <- coef3.current
+    alpha1.new <- matrix(0, ncol=G, nrow=n)
+    alpha2.new <- matrix(0, ncol=G, nrow=n)
+    alpha3.new <- matrix(0, ncol=G, nrow=n)
+    hessian1   <- NULL
+    hessian2   <- NULL
+    hessian3   <- NULL
+    Q.function <- function(coef, Model.Matrix, Expected.log.value, z.mat, wh){
+      q.res <- sum( z.mat[,wh] * exp(coef%*%t(Model.Matrix)) * log(beta.current) ) -
+                sum( z.mat[,wh] * lgamma(exp(coef%*%t(Model.Matrix))) ) +
+                sum( z.mat[,wh] * exp(coef%*%t(Model.Matrix)) * Expected.log.value[,wh] )
       return(q.res)
     }
-    m1             <- stats::glm(alpha1.current ~ Model.Matrix.1[,-1], family=Gamma(link="log"))
-    coef1.optim    <- stats::optim(par               = as.vector(m1$coefficients),
-                            fn                = Q.function,
-                            Model.Matrix      = Model.Matrix.1,
-                            Expected.log.value= Expected.logx1,
-                            z.mat             = z.new,
-                            gr                = NULL,
-                            hessian           = TRUE,
-                            control           = list(fnscale=-1, maxit=2e+9))
-    if (coef1.optim$convergence != 0) cat("optim coef1 not converged at G=",g, ". \n")
-    coef1.new      <- coef1.optim$par
-    alpha1.new     <- as.vector(exp(coef1.new%*%t(Model.Matrix.1)))
-    hessian1       <- coef1.optim$hessian
-
-    m2             <- stats::glm(alpha2.current ~ Model.Matrix.2[,-1], family=Gamma(link="log") )#, weights=z.new[,g]
-    coef2.new.temp <- as.vector(m2$coefficients)
-    coef2.optim    <- stats::optim(par               = coef2.new.temp,
-                            fn                = Q.function,
-                            Model.Matrix      = Model.Matrix.2,
-                            Expected.log.value= Expected.logx2,
-                            z.mat             = z.new,
-                            gr                = NULL,
-                            hessian           = TRUE,
-                            control           = list(fnscale=-1, maxit=2e+9))
-    if (coef2.optim$convergence != 0) cat("optim coef2 not converged at G=",g, ". \n")
-    coef2.new      <- coef2.optim$par
-    alpha2.new     <- as.vector(exp(coef2.new%*%t(Model.Matrix.2)))
-    hessian2       <- coef2.optim$hessian
-
-    m3             <- stats::glm(alpha3.current ~ Model.Matrix.3[,-1], family=Gamma(link="log") )#, weights=z.new[,g])
-    coef3.new.temp <- as.vector(m3$coefficients)
-    coef3.optim    <- stats::optim(par               = coef3.new.temp,
-                            fn                = Q.function,
-                            Model.Matrix      = Model.Matrix.3,
-                            Expected.log.value= Expected.logx3,
-                            z.mat             = z.new,
-                            gr                = NULL,
-                            hessian           = TRUE,
-                            control           = list(fnscale=-1, maxit=2e+9))
-    if (coef3.optim$convergence != 0) cat("optim coef3 not converged at G=",g, ". \n")
-    coef3.new      <- coef3.optim$par
-    alpha3.new     <- as.vector(exp(coef3.new%*%t(Model.Matrix.3)))
-    hessian3       <- coef3.optim$hessian
-
     for (g in c(1:G)){
-      beta.new[g]    <- sum(z.new[,g]*(alpha1.new + alpha2.new + alpha3.new)) / sum(z.new[,g]*(Expected.x1[,g]+Expected.x2[,g]+Expected.x3[,g]))
+      m1             <- stats::glm(alpha1.current[,g] ~ Model.Matrix.1[,-1], family=Gamma(link="log")  )#, weights=z.new[,g])
+      coef1.optim    <- stats::optim(par               = as.vector(m1$coefficients),
+                              fn                = Q.function,
+                              Model.Matrix      = Model.Matrix.1,
+                              Expected.log.value= Expected.logx1,
+                              z.mat             = z.new,
+                              wh                = g,
+                              gr                = NULL,
+                              hessian           = TRUE,
+                              control           = list(fnscale=-1, maxit=2e+9))
+      if (coef1.optim$convergence != 0) cat("optim coef1 not converged at G=",g, ". \n")
+      coef1.new[,g]  <- coef1.optim$par
+      alpha1.new[,g] <- as.vector(exp(coef1.new[,g]%*%t(Model.Matrix.1)))
+      hessian1       <- append(hessian1, list(coef1.optim$hessian))
+
+      m2             <- stats::glm(alpha2.current[,g] ~ Model.Matrix.2[,-1], family=Gamma(link="log") )#, weights=z.new[,g]
+      coef2.optim    <- stats::optim(par               = as.vector(m2$coefficients),
+                              fn                = Q.function,
+                              Model.Matrix      = Model.Matrix.2,
+                              Expected.log.value= Expected.logx2,
+                              z.mat             = z.new,
+                              wh                = g,
+                              gr                = NULL,
+                              hessian           = TRUE,
+                              control           = list(fnscale=-1, maxit=2e+9))
+      if (coef2.optim$convergence != 0) cat("optim coef2 not converged at G=",g, ". \n")
+      coef2.new[,g]  <- coef2.optim$par
+      alpha2.new[,g] <- as.vector(exp(coef2.new[,g]%*%t(Model.Matrix.2)))
+      hessian2       <- append(hessian2, list(coef2.optim$hessian))
+
+      m3             <- stats::glm(alpha3.current[,g] ~ Model.Matrix.3[,-1], family=Gamma(link="log") )#, weights=z.new[,g])
+      coef3.optim    <- stats::optim(par               = as.vector(m3$coefficients),
+                              fn                = Q.function,
+                              Model.Matrix      = Model.Matrix.3,
+                              Expected.log.value= Expected.logx3,
+                              z.mat             = z.new,
+                              wh                = g,
+                              gr                = NULL,
+                              hessian           = TRUE,
+                              control           = list(fnscale=-1, maxit=2e+9))
+      if (coef3.optim$convergence != 0) cat("optim coef3 not converged at G=",g, ". \n")
+      coef3.new[,g]  <- coef3.optim$par
+      alpha3.new[,g] <- as.vector(exp(coef3.new[,g]%*%t(Model.Matrix.3)))
+      hessian3       <- append(hessian3, list(coef3.optim$hessian))
     }
+    beta.new         <- sum( z.new*(alpha1.new + alpha2.new + alpha3.new) ) / sum( z.new*(Expected.x1+Expected.x2+Expected.x3) )
 
     if (verbose){
-      cat(c("alpha1:", round(mean(alpha1.new),4), "\n"))
-      cat(c("alpha2:", round(mean(alpha2.new),4), "\n"))
-      cat(c("alpha3:", round(mean(alpha3.new),4), "\n"))
+      cat(c("alpha1:", round(colMeans(alpha1.new),4), "\n"))
+      cat(c("alpha2:", round(colMeans(alpha2.new),4), "\n"))
+      cat(c("alpha3:", round(colMeans(alpha3.new),4), "\n"))
       cat(c("beta:",   round(beta.new,4), "\n"))
-      if (is.matrix(p.z.new)) { cat(c("p.z:", round(colMeans(p.z.new),4), "\n")) } else cat(c("p.z:", round(p.z.new,4), "\n"))
+      if (is.matrix(p.z.new)) { cat(c("p.z:", round(colMeans(p.z.new),4), "\n")) } else cat(c("p.z:", round(p.z.new, 4), "\n"))
     }
 
     loglike.current<- loglike.new
@@ -264,30 +265,31 @@ MBGR.EC <- function(y,
   if (!all(loglike[1:(j-1)] == cummax(loglike[1:(j-1)]))){
     cat("Loglikelihood is not strictly monotonically increasing!", "\n")
   }
-  all.hessian <- list(hessian1, hessian2, hessian3)
+
+  all.hessian <- c(hessian1, hessian2, hessian3)
   if (!all(sapply(all.hessian, matrixcalc::is.negative.definite))){
     cat("Hessian matrix is not negative-definite.", "\n")
   }
 
   #	calculation of BIC and AIC for bivpoisson model
   if (gating=="C"){
-    noparams <- length(coef1.current) + length(coef2.current) + length(coef3.current) + G + (G-1)
+    noparams <- G*(dim(coef1.current)[1]) + G*(dim(coef2.current)[1]) + G*(dim(coef3.current)[1]) + 1 + (G-1)
   } else if (gating=="E"){
-    noparams <- length(coef1.current) + length(coef2.current) + length(coef3.current) + G
+    noparams <- G*(dim(coef1.current)[1]) + G*(dim(coef2.current)[1]) + G*(dim(coef3.current)[1]) + 1
   } else {
-    noparams <- length(coef1.current) + length(coef2.current) + length(coef3.current) + G + mp$rank
+    noparams <- G*(dim(coef1.current)[1]) + G*(dim(coef2.current)[1]) + G*(dim(coef3.current)[1]) + 1 + mp$rank
   }
-  AIC<- -2*loglike[j-1] + noparams * 2
-  BIC<- -2*loglike[j-1] + noparams * log(n)
+  AIC <- -2*loglike[j-1] + noparams * 2
+  BIC <- -2*loglike[j-1] + noparams * log(n)
   classification <- apply(z.new, 1, which.max)
 
   # fitted values
   if (gating=="C" || gating=="E"){
-    y1.fitted <- sweep(rep.col(alpha1.current+alpha3.current,G),2,beta.current,FUN="/") %*% p.z.current
-    y2.fitted <- sweep(rep.col(alpha2.current+alpha3.current,G),2,beta.current,FUN="/") %*% p.z.current
-  } else {
-    y1.fitted <- rowSums(p.z.current * sweep(rep.col(alpha1.current+alpha3.current,G),2,beta.current,FUN="/") )
-    y2.fitted <- rowSums(p.z.current * sweep(rep.col(alpha2.current+alpha3.current,G),2,beta.current,FUN="/") )
+    y1.fitted <- sweep((alpha1.current+alpha3.current),2,rep(beta.current,G),FUN="/") %*% p.z.current
+    y2.fitted <- sweep((alpha2.current+alpha3.current),2,rep(beta.current,G),FUN="/") %*% p.z.current
+  }  else {
+    y1.fitted <- rowSums(p.z.current * sweep((alpha1.current+alpha3.current),2,rep(beta.current,G),FUN="/") )
+    y2.fitted <- rowSums(p.z.current * sweep((alpha2.current+alpha3.current),2,rep(beta.current,G),FUN="/") )
   }
   y1.residual <- y1 - y1.fitted
   y2.residual <- y2 - y2.fitted
@@ -297,13 +299,13 @@ MBGR.EC <- function(y,
   f2.formula <- formula(paste(namey2, as.character(f2.new)[3], sep="~"))
   f3.formula <- formula(paste("", as.character(f3.new)[3], sep="~"))
   if (gating == "C") {
-    newgating <- gating.formula <- "C"} else if (gating == "E") {
+    newgating <- gating.formula <- "C" } else if (gating == "E") {
       newgating <- gating.formula <- "E"} else {
         gating.formula <- formula(paste("", as.character(gating.new)[3], sep="~"))
         newgating <- "V"}
 
   #  Calculation of output
-  result<-list(modelName    = "EC",
+  result<-list(modelName    = "VI",
                gating       = newgating,
                coefficients = list(expert = list(alpha1=coef1.current,
                                                  alpha2=coef2.current,
@@ -330,8 +332,13 @@ MBGR.EC <- function(y,
                                    hessian3 = hessian3),
                n            = n,
                y            = cbind(y1, y2),
-               Model.Matrix = list(Model.Matrix.1, Model.Matrix.2, Model.Matrix.3),
-               formula      = list(f1.formula, f2.formula, f3.formula, gating.formula),
+               Model.Matrix = list(Model.Matrix.1,
+                                   Model.Matrix.2,
+                                   Model.Matrix.3),
+               formula      = list(f1.formula,
+                                   f2.formula,
+                                   f3.formula,
+                                   gating.formula),
                gating.model = mp,
                call         = tempcall,
                iterations   = (j-1))

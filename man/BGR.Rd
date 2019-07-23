@@ -5,7 +5,7 @@
 \title{Bivariate Gamma Regression}
 \usage{
 BGR(modelName = c("EE", "EI", "IE"), y, data, f1, f2, f3, f4,
-  maxit = 100, tol = 1e-05, Aitken = FALSE, verbose = TRUE)
+  maxit = 100, tol = 1e-05, verbose = TRUE)
 }
 \arguments{
 \item{modelName}{A character string indicating which model to be fitted. Need to be one of "EE", "EI", "IE".}
@@ -54,6 +54,8 @@ An object of class \code{BGR} providing the estimation results.
 Bivariate gamma regression models for three model types: EE, EI, IE. Models are estimated by EM algorithm.
 }
 \examples{
+
+\donttest{
 mod1 <- BGR(modelName = "EE",
             y = c("y1","y2"), data = fullsim,
             f1 = ~ w1 + w2,
@@ -62,6 +64,7 @@ mod1 <- BGR(modelName = "EE",
             f4 = ~ w1 + w2 + w3,
             verbose= FALSE)
 mod1
+
 mod2 <- BGR(modelName = "EI",
             y = c("y1","y2"), data = fullsim,
             f1     = ~ w1 + w2,
@@ -74,4 +77,6 @@ mod3 <- BGR(modelName = "IE",
             f4     = ~ w1 + w2 + w3,
             verbose= FALSE)
 mod3
+}
+
 }

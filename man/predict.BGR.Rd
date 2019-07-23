@@ -26,6 +26,8 @@ a list with components (depends on model class):
 Obtains predictions from the fitted bivariate gamma regression models.
 }
 \examples{
+
+\donttest{
 mod1 <- BGR(modelName = "EE",
             y = c("y1","y2"), data = fullsim,
             f1 = ~ w1 + w2,
@@ -34,6 +36,8 @@ mod1 <- BGR(modelName = "EE",
             f4 = ~ w1 + w2 + w3,
             verbose= FALSE)
 fitted1 <- predict(mod1, newdata=fullsim)
+plot(fitted1$fit)
+
 mod2 <- BGR(modelName = "EI",
             y = c("y1","y2"), data = fullsim,
             f1     = ~ w1 + w2,
@@ -46,7 +50,8 @@ mod3 <- BGR(modelName = "IE",
             f4     = ~ w1 + w2 + w3,
             verbose= FALSE)
 fitted3 <- predict(mod3, newdata=fullsim)
-plot(fitted1$fit)
 plot(fitted2$fit)
 plot(fitted3$fit)
+}
+
 }

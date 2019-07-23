@@ -10,22 +10,9 @@
 #' @examples
 #' dbivgamma(c(1,1), alpha=c(0.3, 0.4, 0.5), beta=1, log = TRUE)
 #'
-#' \dontrun{
-#' c1 <- seq(0, 15, by=0.1)[-1]
-#' c2 <- seq(0, 15, by=0.1)[-1]
-#' restable <- matrix(0, nrow = length(c1), ncol=length(c2))
-#' for (i in c(1:length(c1))){
-#'  for (j in c(1:length(c2))){
-#'    restable[i,j] <- dbivgamma(c(c1[i], c2[j]),
-#'                               alpha = c(0.5,0.5,0.5),
-#'                               beta = 1,log=TRUE)
-#'  } }
-#' rownames(restable) <- NULL
-#' colnames(restable) <- NULL
-#' require(lattice)
-#' new.palette=colorRampPalette(c("white","yellow","red"),space="rgb")
-#' levelplot(restable, col.regions=new.palette(20), xlab="Y_1", ylab="Y_2")
-#' }
+#'
+#' @importFrom stats Gamma dgamma
+#' @export
 
 dbivgamma <- function(y, alpha, beta, log=FALSE){
   y1 <- y[1]

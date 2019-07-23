@@ -22,6 +22,8 @@
 Summary method for class "\code{MBGC}"
 }
 \examples{
+
+\donttest{
 clust1 <- MBGC(modelName = "CC", y=c("y1","y2"),
                G=2, gating = "C", data=gatingsim)
 summary(clust1)
@@ -31,4 +33,6 @@ summary(clust2)
 clust4 <- MBGC(modelName = "CC", y=c("y1","y2"),
                G=2, gating = ~w1+w2+w3, data=gatingsim)
 summary(clust4)
+}
+
 }

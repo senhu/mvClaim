@@ -8,6 +8,8 @@
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @examples
+#'
+#' \donttest{
 #' mod <- BGR(modelName = "EE",
 #'            y=c("y1","y2"),
 #'            data   = fullsim,
@@ -17,6 +19,9 @@
 #'            f4     = ~ w1 + w2 + w3,
 #'            verbose= FALSE)
 #' summary(mod)
+#' }
+#'
+#' @export
 
 
 summary.BGR <- function(object, ...){
@@ -35,6 +40,7 @@ summary.BGR <- function(object, ...){
 }
 
 #' @rdname summary.BGR
+#' @export
 
 print.summary.BGR <- function(x, digits = getOption("digits"), ...)
 {

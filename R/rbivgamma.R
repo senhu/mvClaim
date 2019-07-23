@@ -10,6 +10,9 @@
 #' @examples
 #' plot(rbivgamma(2000, alpha=c(1,1,1), beta=1))
 #' plot(rbivgamma(2000, c(0.5, 0.5, 0.2),beta=0.001))
+#'
+#' @importFrom stats rgamma
+#' @export
 
 rbivgamma <- function(n, alpha, beta){
   alpha1 <- alpha[1]

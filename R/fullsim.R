@@ -10,3 +10,6 @@
 #' }
 #' @source Hu, S., Murphy, T. B. and O'Hagan, A. (2019) Bivariate Gamma Mixture of Experts Models for Joint Claims Modeling.
 "fullsim"
+
+#' @rdname fullsim
+"fullsim.test"

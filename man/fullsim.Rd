@@ -3,6 +3,7 @@
 \docType{data}
 \name{fullsim}
 \alias{fullsim}
+\alias{fullsim.test}
 \title{Simulated artificial data with covariates in both the gating and expert networks.}
 \format{A data frame with 500 rows and 6 variables:
 \describe{
@@ -15,6 +16,8 @@ Hu, S., Murphy, T. B. and O'Hagan, A. (2019) Bivariate Gamma Mixture of Experts 
 }
 \usage{
 fullsim
+
+fullsim.test
 }
 \description{
 An artificial dataset containing the bivariate response y1, y2, three covariates w1, w2, w3, and the true label.

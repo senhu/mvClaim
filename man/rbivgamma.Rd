@@ -22,4 +22,5 @@ This function allows you to generate random bivariate gamma variables given the 
 \examples{
 plot(rbivgamma(2000, alpha=c(1,1,1), beta=1))
 plot(rbivgamma(2000, c(0.5, 0.5, 0.2),beta=0.001))
+
 }

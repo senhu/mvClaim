@@ -8,6 +8,8 @@
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @examples
+#'
+#' \donttest{
 #' clust1 <- MBGC(modelName = "CC", y=c("y1","y2"),
 #'                G=2, gating = "C", data=gatingsim)
 #' summary(clust1)
@@ -17,7 +19,9 @@
 #' clust4 <- MBGC(modelName = "CC", y=c("y1","y2"),
 #'                G=2, gating = ~w1+w2+w3, data=gatingsim)
 #' summary(clust4)
-
+#' }
+#'
+#' @export
 
 summary.MBGC <- function(object, ...){
   title <- paste("Mixture of bivariate gamma clustering (MBGC) fitted by EM algorithm")
@@ -39,6 +43,7 @@ summary.MBGC <- function(object, ...){
 }
 
 #' @rdname summary.MBGC
+#' @export
 
 print.summary.MBGC <- function(x, digits = getOption("digits"), ...)
 {

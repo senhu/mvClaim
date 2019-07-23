@@ -2,7 +2,7 @@
 # Method 2
 #--------------------------------------
 
-MBGR.VC <- function(y,
+MBGR_VC <- function(y,
                     data,
                     G,
                     f1,
@@ -134,7 +134,7 @@ MBGR.VC <- function(y,
 
     for (i in seq_len(n)){
       for (g in seq_len(G)){
-        expected.latent.res  <- expected.latent(c(y1[i],y2[i]),
+        expected.latent.res  <- expected_latent(c(y1[i],y2[i]),
                                                 alpha=c(alpha1.current[i,g],alpha2.current[i,g],alpha3.current[i,g]),
                                                 beta=beta.current[g])
         Expected.x3[i,g]     <- expected.latent.res$Expected.s

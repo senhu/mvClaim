@@ -8,6 +8,8 @@
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @examples
+#'
+#' \donttest{
 #' mod <- MBGR(modelName = "CE",
 #'             y=c("y1","y2"),
 #'             data   = fullsim,
@@ -18,8 +20,9 @@
 #'             f4     = ~ w1 + w2 + w3,
 #'             gating = "C")
 #' summary(mod)
-
-
+#' }
+#'
+#' @export
 
 summary.MBGR <- function(object, ...){
   title <- paste("Mixture of bivariate gamma regressions fitted by EM algorithm")
@@ -41,6 +44,7 @@ summary.MBGR <- function(object, ...){
 }
 
 #' @rdname summary.MBGR
+#' @export
 
 print.summary.MBGR <- function(x, digits = getOption("digits"), ...)
 {

@@ -35,6 +35,8 @@
 #'   \item{trace}{All estimated coefficients and alpha, beta values in the EM algorithm.}
 #'
 #' @examples
+#'
+#' \donttest{
 #' mod1 <- BGR(modelName = "EE",
 #'             y = c("y1","y2"), data = fullsim,
 #'             f1 = ~ w1 + w2,
@@ -43,6 +45,7 @@
 #'             f4 = ~ w1 + w2 + w3,
 #'             verbose= FALSE)
 #' mod1
+#'
 #' mod2 <- BGR(modelName = "EI",
 #'             y = c("y1","y2"), data = fullsim,
 #'             f1     = ~ w1 + w2,
@@ -55,8 +58,10 @@
 #'             f4     = ~ w1 + w2 + w3,
 #'             verbose= FALSE)
 #' mod3
-
-
+#' }
+#'
+#' @importFrom stats glm optim uniroot model.matrix Gamma formula runif coef
+#' @export
 
 BGR <- function(modelName = c("EE","EI","IE"),
                 y,
@@ -67,7 +72,6 @@ BGR <- function(modelName = c("EE","EI","IE"),
                 f4,
                 maxit=100,
                 tol=1e-5,
-                Aitken = FALSE,
                 verbose=TRUE){
   switch(modelName,
          EE = {    # BGR.EE: all alpha's and beta are regressed on covariates
@@ -75,7 +79,7 @@ BGR <- function(modelName = c("EE","EI","IE"),
            if (is.null(f2)){ stop("f2 must be supplied for EE model type") }
            if (is.null(f3)){ stop("f3 must be supplied for EE model type") }
            if (is.null(f4)){ stop("f4 must be supplied for EE model type") }
-           return(BGR.EE(data=data, y=y,
+           return(BGR_EE(data=data, y=y,
                          f1=f1, f2=f2, f3=f3, f4=f4,
                          maxit=maxit, tol=tol,
                          verbose=verbose))
@@ -84,14 +88,14 @@ BGR <- function(modelName = c("EE","EI","IE"),
            if (is.null(f1)){ stop("f1 must be supplied for EI model type") }
            if (is.null(f2)){ stop("f2 must be supplied for EI model type") }
            if (is.null(f3)){ stop("f3 must be supplied for EI model type") }
-           return(BGR.EI(data=data, y=y,
+           return(BGR_EI(data=data, y=y,
                          f1=f1, f2=f2, f3=f3,
                          maxit=maxit, tol=tol,
                          verbose=verbose))
            },
          IE = {# BGR.IE: only beta is regressed on its covariates, not alpha
            if (is.null(f4)){ stop("f4 must be supplied for IE model type") }
-           return(BGR.IE(data=data, y=y,
+           return(BGR_IE(data=data, y=y,
                          f4=f4,
                          maxit=maxit, tol=tol,
                          verbose=verbose))
@@ -100,10 +104,9 @@ BGR <- function(modelName = c("EE","EI","IE"),
          )
 }
 
-
 # #' @rdname BGR
 
-BGR.EE <- function(y,
+BGR_EE <- function(y,
                    data,
                    f1,
                    f2,
@@ -198,7 +201,7 @@ BGR.EE <- function(y,
     Expected.logx3 <- rep(0,n)
     den            <- rep(0,n)
     for (i in seq_len(n)){
-      expected.latent.res <- expected.latent(c(y1[i],y2[i]),
+      expected.latent.res <- expected_latent(c(y1[i],y2[i]),
                                              alpha=c(alpha1.current[i],alpha2.current[i],alpha3.current[i]),
                                              beta =beta.current[i])
       Expected.x3[i]      <- expected.latent.res$Expected.s
@@ -366,7 +369,7 @@ BGR.EE <- function(y,
 
 # #' @rdname BGR
 
-BGR.EI <- function(y,
+BGR_EI <- function(y,
                    data,
                    f1,
                    f2,
@@ -451,7 +454,7 @@ BGR.EI <- function(y,
     Expected.logx3 <- rep(0,n)
     den            <- rep(0,n)
     for (i in seq_len(n)){
-      expected.latent.res <- expected.latent(c(y1[i],y2[i]),
+      expected.latent.res <- expected_latent(c(y1[i],y2[i]),
                                              alpha=c(alpha1.current[i],alpha2.current[i],alpha3.current[i]),
                                              beta =beta.current)
       Expected.x3[i]      <- expected.latent.res$Expected.s
@@ -588,7 +591,7 @@ BGR.EI <- function(y,
 
 # #' @rdname BGR
 
-BGR.IE <- function(y,
+BGR_IE <- function(y,
                    data,
                    f4,
                    maxit  = 100,
@@ -651,7 +654,7 @@ BGR.IE <- function(y,
     Expected.logx3 <- rep(0,n)
     den            <- rep(0,n)
     for (i in seq_len(n)){
-      expected.latent.res <- expected.latent(c(y1[i],y2[i]),
+      expected.latent.res <- expected_latent(c(y1[i],y2[i]),
                                              alpha=c(alpha1.current,alpha2.current,alpha3.current),
                                              beta =beta.current[i])
       Expected.x3[i]      <- expected.latent.res$Expected.s
@@ -775,6 +778,7 @@ BGR.IE <- function(y,
   structure(result, class = c('BGR'))
 }
 
+#' @export
 
 print.BGR <- function (x, ...){
   txt <- paste0("'", class(x)[1], "' model of type '", x$modelName, "'")

@@ -21,17 +21,21 @@
 #'   \item{call}{The matched call.}
 #'
 #' @examples
+#'
+#' \donttest{
 #' dat <- rbivgamma(1000, alpha = c(1,2,0.5), beta=0.1)
 #' mod <- BGE(data = dat, verbose = FALSE)
 #' mod
-
+#' }
+#'
+#' @importFrom stats uniroot Gamma
+#' @export
 
 BGE <- function(data,
                 maxit = 200,
                 tol = 1e-5,
                 start = NULL,
-                verbose = TRUE)
-{
+                verbose = TRUE){
   tempcall<-as.call(c(expression(BGE), list(data    = substitute(data),
                                             maxit   = maxit,
                                             tol     = tol,
@@ -174,7 +178,7 @@ BGE.Estep.function <- function(data, alpha, beta){
   logy1s <- rep(0,n)
   logy2s <- rep(0,n)
   for (i in seq_len(n)) {
-    expected.latent.res <- expected.latent(c(data[i,1],data[i,2]),
+    expected.latent.res <- expected_latent(c(data[i,1],data[i,2]),
                                            alpha=c(alpha[1],alpha[2],alpha[3]),
                                            beta=beta)
     s[i] <- expected.latent.res$Expected.s
@@ -198,6 +202,8 @@ BGE.data.loglikelihood <- function(data, alpha, beta){
   }
   return(sum(den))
 }
+
+#' @export
 
 print.BGE <- function (x, ...){ print(x$estimate) }
 

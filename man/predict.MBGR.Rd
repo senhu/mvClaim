@@ -26,6 +26,8 @@ a list with components (depends on model class):
 Obtains predictions from the fitted bivariate gamma regression models.
 }
 \examples{
+
+\donttest{
 m1 <- MBGR(modelName = "VC", G=2,
            y=c("y1","y2"), data = fullsim,
            f1     = ~ w1 + w2,
@@ -34,4 +36,6 @@ m1 <- MBGR(modelName = "VC", G=2,
            f4     = ~ w1 + w2 + w3,
            gating = "C", verbose=FALSE)
 fitted1 <- predict(m1, newdata=fullsim)
+}
+
 }

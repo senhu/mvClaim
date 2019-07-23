@@ -34,7 +34,11 @@ An object of class \code{BGR} providing the estimation results.
 This function allows you to estimate bivariate gamma distribution given a data set using EM algorithm
 }
 \examples{
+
+\donttest{
 dat <- rbivgamma(1000, alpha = c(1,2,0.5), beta=0.1)
 mod <- BGE(data = dat, verbose = FALSE)
 mod
+}
+
 }

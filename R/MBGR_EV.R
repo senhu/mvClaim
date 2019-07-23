@@ -2,7 +2,7 @@
 # Method 8: CEV / EEV / VEV
 #--------------------------------------
 
-MBGR.EV <- function(y,
+MBGR_EV <- function(y,
                     data,
                     G,
                     f1,
@@ -148,7 +148,7 @@ MBGR.EV <- function(y,
     den            <- matrix(0,nrow=n, ncol=G)
     for (i in seq_len(n)){
       for (g in seq_len(G)){
-        expected.latent.res  <- expected.latent(c(y1[i],y2[i]),
+        expected.latent.res  <- expected_latent(c(y1[i],y2[i]),
                                                 alpha=c(alpha1.current[i],
                                                         alpha2.current[i],
                                                         alpha3.current[i]),
@@ -306,11 +306,11 @@ MBGR.EV <- function(y,
 
   # fitted values
   if (gating=="C" || gating=="E"){
-    y1.fitted <- ( rep.col(alpha1.current + alpha3.current,G) / beta.current) %*% p.z.current
-    y2.fitted <- ( rep.col(alpha2.current + alpha3.current,G) / beta.current) %*% p.z.current
+    y1.fitted <- ( rep_col(alpha1.current + alpha3.current,G) / beta.current) %*% p.z.current
+    y2.fitted <- ( rep_col(alpha2.current + alpha3.current,G) / beta.current) %*% p.z.current
   }  else {
-    y1.fitted <- rowSums(p.z.current * (rep.col(alpha1.current + alpha3.current, G)/beta.current) )
-    y2.fitted <- rowSums(p.z.current * (rep.col(alpha2.current + alpha3.current, G)/beta.current) )
+    y1.fitted <- rowSums(p.z.current * (rep_col(alpha1.current + alpha3.current, G)/beta.current) )
+    y2.fitted <- rowSums(p.z.current * (rep_col(alpha2.current + alpha3.current, G)/beta.current) )
   }
   y1.residual <- y1 - y1.fitted
   y2.residual <- y2 - y2.fitted

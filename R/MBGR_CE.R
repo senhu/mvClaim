@@ -2,7 +2,7 @@
 # Method 10: CCE / VCE / ECE
 #--------------------------------------
 
-MBGR.CE <- function(y,
+MBGR_CE <- function(y,
                     data,
                     G,
                     f4,
@@ -95,7 +95,7 @@ MBGR.CE <- function(y,
     den            <- matrix(0,nrow=n, ncol=G)
     for (i in seq_len(n)){
       for (g in seq_len(G)){
-        expected.latent.res  <- expected.latent(c(y1[i],y2[i]),
+        expected.latent.res  <- expected_latent(c(y1[i],y2[i]),
                                                 alpha=c(alpha1.current[g],
                                                         alpha2.current[g],
                                                         alpha3.current[g]),
@@ -147,7 +147,7 @@ MBGR.CE <- function(y,
     alpha2.new <- rep(0, G)
     alpha3.new <- rep(0, G)
     Q.b.function    <- function(coef){
-      q.b.res <- sum( rowSums(z.new * rep.row(alpha1.current+alpha2.current+alpha3.current, n)) * (coef %*% t(Model.Matrix.4)) ) -
+      q.b.res <- sum( rowSums(z.new * rep_row(alpha1.current+alpha2.current+alpha3.current, n)) * (coef %*% t(Model.Matrix.4)) ) -
                   sum( rowSums(z.new*(Expected.x1+Expected.x2+Expected.x3)) * exp(coef %*% t(Model.Matrix.4)) )
       return(q.b.res)
     }
@@ -260,11 +260,11 @@ MBGR.CE <- function(y,
 
   # fitted values
   if (gating == "C" || gating == "E"){
-    y1.fitted <- sweep(rep.col(1/beta.current,G), 2, (alpha1.current+alpha3.current), FUN="*") %*% p.z.current
-    y2.fitted <- sweep(rep.col(1/beta.current,G), 2, (alpha2.current+alpha3.current), FUN="*") %*% p.z.current
+    y1.fitted <- sweep(rep_col(1/beta.current,G), 2, (alpha1.current+alpha3.current), FUN="*") %*% p.z.current
+    y2.fitted <- sweep(rep_col(1/beta.current,G), 2, (alpha2.current+alpha3.current), FUN="*") %*% p.z.current
   }  else {
-    y1.fitted <- rowSums(p.z.current * sweep(rep.col(1/beta.current,G), 2, (alpha1.current+alpha3.current), FUN="*") )
-    y2.fitted <- rowSums(p.z.current * sweep(rep.col(1/beta.current,G), 2, (alpha2.current+alpha3.current), FUN="*") )
+    y1.fitted <- rowSums(p.z.current * sweep(rep_col(1/beta.current,G), 2, (alpha1.current+alpha3.current), FUN="*") )
+    y2.fitted <- rowSums(p.z.current * sweep(rep_col(1/beta.current,G), 2, (alpha2.current+alpha3.current), FUN="*") )
   }
   y1.residual <- y1 - y1.fitted
   y2.residual <- y2 - y2.fitted

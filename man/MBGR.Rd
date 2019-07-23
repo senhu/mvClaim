@@ -27,7 +27,7 @@ MBGR(modelName = c("VC", "VI", "VV", "VE", "CV", "IV", "EV", "EC", "CE"),
 
 \item{gating}{Specifies the gating network in the MoE model, can be "C", "E" or a regression formula.}
 
-\item{initialization}{Specifies initialization method for EM algorithm}
+\item{initialization}{Specifies initialization method for EM algorithm. The default is "\code{mclust}".}
 
 \item{maxit}{A parameter that controls the number of maximum iteration in the EM algorithm. The default is 100.}
 
@@ -67,15 +67,15 @@ An object of class \code{BGR} providing the estimation results.
 Mixture of bivariate gamma regressions, or model-based clustering with bivariage gamma distributions and covariates, for various parsimonious model types. Models are estimated by EM algorithm.
 }
 \examples{
-m2 <- MBGR(modelName = "CE",
-           y=c("y1","y2"),
-           data   = fullsim,
-           G=2,
+
+\donttest{
+m1 <- MBGR(modelName = "VV",
+           y=c("y1","y2"), data = fullsim, G=2,
            f1     = ~ w1 + w2,
            f2     = ~ w2 + w3,
            f3     = ~ w1 + w2 + w3,
            f4     = ~ w1 + w2 + w3,
-           gating = "C",
-           maxit  = 200,
-           tol    = 1e-4)
+           gating = "C")
+}
+
 }
