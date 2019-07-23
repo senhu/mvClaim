@@ -1,15 +1,17 @@
-#' Plot Mixture of Bivariate Gamma Regressions/Clustering Results
+#' Plot Mixture of Bivariate Gamma Regressions and Clustering Results
 #'
 #' Plot mixture of bivariate gamma regressions, or model-based clustering with bivariage gamma distributions and covariates: classification, uncertainty
 #'
 #' @param object Output from MBGR functions.
 #' @param type The type of graph requested, either \code{"classification"} or \code{"uncertainty"}.
-#' @param {xlab, ylab} Optional labels for the x-axis and the y-axis.
+#' @param xlab,ylab Optional labels for the x-axis and the y-axis.
 #' @param col The colors of points in clusters.
 #' @param pch The plotting characters or symbols in clusters.
 #' @param main A logical or \code{NULL} indicating whether or not to add a title to the plot identifying the type of plot.
 #'
-#' @return For BGR model, fitted values are plotted. For MBGR model:
+#' @return For BGR model, fitted values are plotted.
+#'
+#'   For MBGR model:
 #'   \item{type=="classification"}{a plot showing the clustering labels.}
 #'   \item{type=="uncertainty"}{a plot of classification uncertainty.}
 #'   \item{type=="fitted"}{a plot of fitted values.}
@@ -18,10 +20,22 @@
 #'   \item{type=="uncertainty"}{a plot of classification uncertainty.}
 #'
 #' @examples
+#' m1 <- MBGR(modelName = "CE", y=c("y1","y2"),
+#'            data   = fullsim, G=2,
+#'            f1     = ~ w1 + w2,
+#'            f2     = ~ w2 + w3,
+#'            f3     = ~ w1 + w2 + w3,
+#'            f4     = ~ w1 + w2 + w3,
+#'            gating = "C", verbose = FALSE)
 #' plot.MBGR(m1, type="classification")
 #' plot.MBGR(m1, type="uncertainty")
 #' plot.MBGR(m1, type="fitted")
-#' plot.BGR(s1)
+#' m2 <- BGR(modelName = "EI",
+#'           y = c("y1","y2"), data = fullsim,
+#'           f1     = ~ w1 + w2,
+#'           f2     = ~ w2 + w3,
+#'           f3     = ~ w1 + w2 + w3, verbose = FALSE)
+#' plot.BGR(m2)
 
 plot <- function(object,...){
   UseMethod("plot", object)

@@ -42,16 +42,19 @@
 #'             f3 = ~ w1 + w2 + w3,
 #'             f4 = ~ w1 + w2 + w3,
 #'             verbose= FALSE)
+#' mod1
 #' mod2 <- BGR(modelName = "EI",
 #'             y = c("y1","y2"), data = fullsim,
 #'             f1     = ~ w1 + w2,
 #'             f2     = ~ w2 + w3,
 #'             f3     = ~ w1 + w2 + w3,
 #'             verbose= FALSE)
+#' mod2
 #' mod3 <- BGR(modelName = "IE",
 #'             y = c("y1","y2"), data = fullsim,
 #'             f4     = ~ w1 + w2 + w3,
 #'             verbose= FALSE)
+#' mod3
 
 
 
@@ -98,7 +101,7 @@ BGR <- function(modelName = c("EE","EI","IE"),
 }
 
 
-#' @rdname BGR
+# #' @rdname BGR
 
 BGR.EE <- function(y,
                    data,
@@ -361,7 +364,7 @@ BGR.EE <- function(y,
   structure(result, class = c('BGR'))
 }
 
-#' @rdname BGR
+# #' @rdname BGR
 
 BGR.EI <- function(y,
                    data,
@@ -583,7 +586,7 @@ BGR.EI <- function(y,
   structure(result, class = c('BGR'))
 }
 
-#' @rdname BGR
+# #' @rdname BGR
 
 BGR.IE <- function(y,
                    data,

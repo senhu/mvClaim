@@ -7,9 +7,7 @@
 #' @param beta value of beta in bivariate gamma distribution
 #' @param log logical; if TRUE, probabilities p are given as log(p). Default is FALSE.
 #'
-#' @export
-#'
-#' @example
+#' @examples
 #' dbivgamma(c(1,1), alpha=c(0.3, 0.4, 0.5), beta=1, log = TRUE)
 #'
 #' \dontrun{

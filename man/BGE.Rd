@@ -2,10 +2,9 @@
 % Please edit documentation in R/BGE.R
 \name{BGE}
 \alias{BGE}
-\title{Bivariate gamma distribution estimation}
+\title{Bivariate Gamma Distribution Estimation}
 \usage{
-BGE(data, maxit = 300, tol = 1e-06, start.value = NULL,
-  Aitken = FALSE, verbose = TRUE)
+BGE(data, maxit = 200, tol = 1e-05, start = NULL, verbose = TRUE)
 }
 \arguments{
 \item{data}{A numeric vector, matrix or data frame of observations. Categorical variables are not allowed. If a matrix or data frame, rows correspond to observations and columns correspond to variables.}
@@ -14,15 +13,28 @@ BGE(data, maxit = 300, tol = 1e-06, start.value = NULL,
 
 \item{tol}{A value giving relative convergence tolerance for the log-likelihood. The default is 1e-6.}
 
-\item{start.value}{Starting value of the EM algorithm}
-
-\item{Aitken}{logical; indicate whether Aitken Acceleration is used}
+\item{start}{Starting value of the EM algorithm}
 
 \item{verbose}{logical; controls whether summary result of each EM iteration is displayed during the fitting procedure. Default is TRUE.}
 }
 \value{
-
+An object of class \code{BGR} providing the estimation results.
+  The details of the output components are:
+  \item{estimate}{The estimated parametr values.}
+  \item{loglike}{The final estimated maximum log-likelihood value.}
+  \item{ll}{The sequence of log-likelihood values in the EM algorithm fitting process.}
+  \item{df}{The number of estimated parameters.}
+  \item{AIC}{AIC values.}
+  \item{BIC}{BIC values.}
+  \item{iter}{Total iteration numbers.}
+  \item{n}{The number of observations in the data.}
+  \item{call}{The matched call.}
 }
 \description{
 This function allows you to estimate bivariate gamma distribution given a data set using EM algorithm
+}
+\examples{
+dat <- rbivgamma(1000, alpha = c(1,2,0.5), beta=0.1)
+mod <- BGE(data = dat, verbose = FALSE)
+mod
 }

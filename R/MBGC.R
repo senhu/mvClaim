@@ -4,7 +4,7 @@
 #'
 #' @param modelName A character string indicating which model to be fitted. Need to be one of "CC", "CI", "IC".
 #' @param y A vector of character strings indicating which variables in the data are treated as response or dependent variables.
-#' @param G
+#' @param G An integer specifying the numbers of mixture components.
 #' @param gating Specifies the gating network in the MoE model, can be "C", "E" or a regression formula.
 #' @param data A matrix or data frame of observations. Categorical variables are allowed as covariates.
 #' @param maxit A parameter that controls the number of maximum iteration in the EM algorithm. The default is 100.
@@ -42,16 +42,22 @@
 #' @examples
 #' clust1 <- MBGC(modelName = "CC", y=c("y1","y2"),
 #'                G=2, gating = "C", data=gatingsim, verbose=FALSE)
+#' clust1
 #' clust2 <- MBGC(modelName = "CI", y=c("y1","y2"),
 #'                G=2, gating = "C", data=gatingsim)
+#' clust2
 #' clust3 <- MBGC(modelName = "IC", y=c("y1","y2"),
 #'                G=2, gating = "C", data=gatingsim)
+#' clust3
 #' clust4 <- MBGC(modelName = "CC", y=c("y1","y2"),
 #'                G=2, gating = ~w1+w2+w3, data=gatingsim)
+#' clust4
 #' clust5 <- MBGC(modelName = "CI", y=c("y1","y2"),
 #'                G=2, gating = ~w1+w2+w3, data=gatingsim)
+#' clust5
 #' clust6 <- MBGC(modelName = "IC", y=c("y1","y2"),
 #'                G=2, gating = ~w1+w2+w3, data=gatingsim)
+#' clust6
 
 
 MBGC <- function(modelName = c("CC","CI","IC"),
@@ -93,7 +99,7 @@ print.MBGC <- function (x, ...){
   invisible(x)
 }
 
-#' @rdname MBGC
+# #' @rdname MBGC
 
 MBGC.CC <- function(y,
                     G,
@@ -373,7 +379,7 @@ MBGC.CC <- function(y,
   structure(result, class = 'MBGC')
 }
 
-#' @rdname MBGC
+# #' @rdname MBGC
 
 MBGC.CI <- function(y,
                     G,
@@ -647,7 +653,7 @@ MBGC.CI <- function(y,
   structure(result, class = 'MBGC')
 }
 
-#' @rdname MBGC
+# #' @rdname MBGC
 
 MBGC.IC <- function(y,
                     G,

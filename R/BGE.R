@@ -20,14 +20,10 @@
 #'   \item{n}{The number of observations in the data.}
 #'   \item{call}{The matched call.}
 #'
-#' @example
-#' ndat <- rbivgamma(500, alpha = c(1,2,0.5), beta=0.1)
-#' plot(ndat, xlab="", ylab="")
-#' mod <- BGE(data = ndat,
-#'            maxit = 100, tol = 1e-5,
-#'            verbose = TRUE)
+#' @examples
+#' dat <- rbivgamma(1000, alpha = c(1,2,0.5), beta=0.1)
+#' mod <- BGE(data = dat, verbose = FALSE)
 #' mod
-#'
 
 
 BGE <- function(data,
