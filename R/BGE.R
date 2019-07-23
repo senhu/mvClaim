@@ -1,53 +1,55 @@
-#' Bivariate gamma distribution estimation
+#' Bivariate Gamma Distribution Estimation
 #'
 #' This function allows you to estimate bivariate gamma distribution given a data set using EM algorithm
 #'
 #' @param data A numeric vector, matrix or data frame of observations. Categorical variables are not allowed. If a matrix or data frame, rows correspond to observations and columns correspond to variables.
 #' @param maxit An integer limits on the number of EM iterations. The default is 300.
 #' @param tol A value giving relative convergence tolerance for the log-likelihood. The default is 1e-6.
-#' @param start.value Starting value of the EM algorithm
-#' @param Aitken logical; indicate whether Aitken Acceleration is used
+#' @param start Starting value of the EM algorithm
 #' @param verbose logical; controls whether summary result of each EM iteration is displayed during the fitting procedure. Default is TRUE.
 #'
-#' @return
+#' @return An object of class \code{BGR} providing the estimation results.
+#'   The details of the output components are:
+#'   \item{estimate}{The estimated parametr values.}
+#'   \item{loglike}{The final estimated maximum log-likelihood value.}
+#'   \item{ll}{The sequence of log-likelihood values in the EM algorithm fitting process.}
+#'   \item{df}{The number of estimated parameters.}
+#'   \item{AIC}{AIC values.}
+#'   \item{BIC}{BIC values.}
+#'   \item{iter}{Total iteration numbers.}
+#'   \item{n}{The number of observations in the data.}
+#'   \item{call}{The matched call.}
 #'
 #' @example
 #' ndat <- rbivgamma(500, alpha = c(1,2,0.5), beta=0.1)
 #' plot(ndat, xlab="", ylab="")
-#'
-#' example <- BGE(data = ndat,
+#' mod <- BGE(data = ndat,
 #'            maxit = 100, tol = 1e-5,
-#'            Aitken = FALSE, verbose = TRUE)
-#' plot(example$loglike.seq, pch=20)
-#' all(example$loglike.seq == cummax(example$loglike.seq))
+#'            verbose = TRUE)
+#' mod
+#'
 
 
 BGE <- function(data,
-                maxit=300,
-                tol=1e-6,
-                start.value=NULL,
-                Aitken=FALSE,
-                verbose=TRUE){
-
-  #-------------------------------------------------
-  templist <- list(data        = substitute(data),
-                   maxit       = maxit,
-                   tol         = tol,
-                   start.value = start.value,
-                   Aitken      = Aitken,
-                   verbose     = verbose)
-  tempcall <- as.call( c(expression(BGE), templist) )
-  rm(templist)
-  #-------------------------------------------------
+                maxit = 200,
+                tol = 1e-5,
+                start = NULL,
+                verbose = TRUE)
+{
+  tempcall<-as.call(c(expression(BGE), list(data    = substitute(data),
+                                            maxit   = maxit,
+                                            tol     = tol,
+                                            start   = start,
+                                            verbose = verbose)) )
 
   n<-dim(data)[1]
   p<-dim(data)[2]
   if (p!=2){stop("The data set is not bivariate.")}
   y1 <- data[,1]
   y2 <- data[,2]
-  #--------------------
+
   # starting value
-  if (is.null(start.value)){
+  if (is.null(start)){
     t3 <- apply(data, 1, min)/2
     t.y1 <- y1-t3
     t.y2 <- y2-t3
@@ -61,21 +63,18 @@ BGE <- function(data,
     alpha2.current <- fitd.2$estimate[1]
     alpha3.current <- fitd.3$estimate[1]
   } else {
-    if (length(start.value) != 4){stop("wrong starting values provided")}
-    alpha1.current <- start.value[1]
-    alpha2.current <- start.value[2]
-    alpha3.current <- start.value[3]
-    beta.current   <- start.value[4]
+    if (length(start) != 4){stop("wrong starting values provided")}
+    alpha1.current <- start[1]
+    alpha2.current <- start[2]
+    alpha3.current <- start[3]
+    beta.current   <- start[4]
   }
-  #--------------------
+
   j<-1
   loglike.diff    <- 1000
   loglike         <- rep(0,maxit)
   loglike.store   <- rep(-sqrt(.Machine$double.xmax), 3)
-  alpha1.trace    <- alpha1.current
-  alpha2.trace    <- alpha2.current
-  alpha3.trace    <- alpha3.current
-  beta.trace      <- beta.current
+
   loglike.current <- BGE.data.loglikelihood(data,
                                             alpha=c(alpha1.current, alpha2.current, alpha3.current),
                                             beta=beta.current)
@@ -136,19 +135,11 @@ BGE <- function(data,
     }
 
     loglike.store <- c(loglike.store[-1], loglike.new)
-    if (Aitken){
-      loglike.diff <- abs(MoEClust::MoE_aitken(loglike.store)$linf - loglike.current)
-    } else {
-      loglike.diff <- abs(loglike.new - loglike.current) / (1+abs(loglike.new))
-    }
+    loglike.diff <- abs(loglike.new - loglike.current) / (1+abs(loglike.new))
 
     if (verbose){
       cat(c("iter:", j, "; new loglike:", round(loglike.new,4), "; loglike change:", round(loglike.diff,7), "\n"))
     }
-    alpha1.trace   <- c(alpha1.trace, alpha1.new)
-    alpha2.trace   <- rbind(alpha2.trace, alpha2.new)
-    alpha3.trace   <- rbind(alpha3.trace, alpha3.new)
-    beta.trace     <- rbind(beta.trace, beta.new)
     loglike[j]  <- loglike.new
     alpha1.current <- alpha1.new
     alpha2.current <- alpha2.new
@@ -159,29 +150,24 @@ BGE <- function(data,
   }
 
   if (!all(loglike[1:(j-1)] == cummax(loglike[1:(j-1)]))){
-    cat("Loglikelihood is not monotonically increasing!", "\n")
+    cat("Loglikelihood is not strictly monotonically increasing!", "\n")
   }
-
   noparams <- 4
   AIC <- (-2*loglike.new + noparams * 2)
   BIC <- (-2*loglike.new + noparams * log(n))
 
-  result<-list(alpha1        = alpha1.new,
-               alpha2        = alpha2.new,
-               alpha3        = alpha3.new,
-               beta          = beta.new,
-               loglikelihood = loglike.new,
-               loglike.seq   = loglike[1:(j-1)],
-               parameters.number=noparams,
-               AIC           = AIC,
-               BIC           = BIC,
-               alpha1.trace  = alpha1.trace,
-               alpha2.trace  = alpha2.trace,
-               alpha3.trace  = alpha3.trace,
-               beta.trace    = beta.trace,
-               iterations    = (j-1),
-               call          = tempcall)
-  return(result)
+  result<-list(estimate = c("alpha1"=alpha1.new,
+                            "alpha2"=alpha2.new,
+                            "alpha3"=alpha3.new,
+                            "beta"  =beta.new),
+               loglike    = loglike.new,
+               ll         = loglike[1:(j-1)],
+               df         = noparams,
+               AIC        = AIC,
+               BIC        = BIC,
+               iter       = (j-1),
+               call       = tempcall)
+  structure(result, class = c('BGE'))
 }
 
 
@@ -200,7 +186,6 @@ BGE.Estep.function <- function(data, alpha, beta){
     logy1s[i] <- expected.latent.res$Expected.logy1s
     logy2s[i] <- expected.latent.res$Expected.logy2s
     #if ( is.nan(s[i]) || is.na(s[i]) ){stop("warings3")}
-    #print(i)
   }
   return(list("s"=s, "logs"=logs, "logy1s"=logy1s, "logy2s"=logy2s))
 }
@@ -217,6 +202,8 @@ BGE.data.loglikelihood <- function(data, alpha, beta){
   }
   return(sum(den))
 }
+
+print.BGE <- function (x, ...){ print(x$estimate) }
 
 
 

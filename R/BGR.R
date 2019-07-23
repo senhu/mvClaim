@@ -1,215 +1,185 @@
-#' Bivariate gamma regression
+#' Bivariate Gamma Regression
 #'
 #' Bivariate gamma regression models for three model types: EE, EI, IE. Models are estimated by EM algorithm.
 #'
 #' @param modelName A character string indicating which model to be fitted. Need to be one of "EE", "EI", "IE".
-#' @param response A vector of character strings indicating which variables in the data are treated as response or dependent variables.
+#' @param y A vector of character strings indicating which variables in the data are treated as response or dependent variables.
 #' @param data A matrix or data frame of observations. Categorical variables are allowed as covariates.
-#' @param l1 A regression formula for the \eqn{latex}{\alpha_1} parameter in the bivariate gamma distribution. Note that, depending on the model type, might not be necessary to provide it.
-#' @param l2 A regression formula for the \eqn{latex}{\alpha_2} parameter in the bivariate gamma distribution. Note that, depending on the model type, might not be necessary to provide it.
-#' @param l3 A regression formula for the \eqn{latex}{\alpha_3} parameter in the bivariate gamma distribution. Note that, depending on the model type, might not be necessary to provide it.
-#' @param l4 A regression formula for the \eqn{latex}{\beta} parameter in the bivariate gamma distribution. Note that, depending on the model type, might not be necessary to provide it.
-#' @param expo Exposure variable
+#' @param f1 A regression formula for the \eqn{latex}{\alpha_1} parameter in the bivariate gamma distribution. Note that, depending on the model type, might not be necessary to provide it.
+#' @param f2 A regression formula for the \eqn{latex}{\alpha_2} parameter in the bivariate gamma distribution. Note that, depending on the model type, might not be necessary to provide it.
+#' @param f3 A regression formula for the \eqn{latex}{\alpha_3} parameter in the bivariate gamma distribution. Note that, depending on the model type, might not be necessary to provide it.
+#' @param f4 A regression formula for the \eqn{latex}{\beta} parameter in the bivariate gamma distribution. Note that, depending on the model type, might not be necessary to provide it.
 #' @param maxit A parameter that controls the number of maximum iteration in the EM algorithm. The default is 100.
 #' @param tol A parameter that controls the convergence tolerance in the EM algorithm. The default is 1e-5.
-#' @param Aitken A parameter that contols whether Aitken acceleration is used.
 #' @param verbose A logical controlling whether estimations in each EM iteration are shown in the fitting process. The default is TRUE.
 #'
 #' @return An object of class \code{BGR} providing the estimation results.
 #'   The details of the output components are:
 #'   \item{call}{The matched call.}
-#'   \item{coef}{The estimated coefficients.}
+#'   \item{coefficients}{The estimated coefficients.}
 #'   \item{alpha1}{The estimated alpha1 values.}
 #'   \item{alpha2}{The estimated alpha2 values.}
 #'   \item{alpha3}{The estimated alpha3 values.}
 #'   \item{beta}{The estimated beta values.}
-#'   \item{trace}{All estimated coefficients and alpha, beta values in the EM algorithm.}
-#'   \item{fitted}{The fitted values of the regression.}
+#'   \item{fitted.values}{The fitted values of the regression.}
 #'   \item{loglike}{The final estimated maximum log-likelihood value.}
-#'   \item{llseq}{The sequence of log-likelihood values in the EM algorithm fitting process.}
-#'   \item{param.number}{Number of estimated parameters.}
+#'   \item{ll}{The sequence of log-likelihood values in the EM algorithm fitting process.}
+#'   \item{df}{Number of estimated parameters.}
 #'   \item{AIC}{AIC values.}
 #'   \item{BIC}{BIC values.}
 #'   \item{iter}{Total iteration numbers.}
 #'   \item{formula}{The formulas used in the regression.}
 #'   \item{y}{The input response data.}
+#'   \item{n}{The number of observations in the data.}
 #'   \item{Model.Matrix}{The used model matrix for each regression formula.}
+#'   \item{trace}{All estimated coefficients and alpha, beta values in the EM algorithm.}
 #'
 #' @examples
-#' m1 <- BGR(modelName = "EE",
-#'           data   = regsim,
-#'           response=c("y1","y2"),
-#'           l1     = ~ w1 + w2,
-#'           l2     = ~ w2 + w3,
-#'           l3     = ~ w1 + w2 + w3,
-#'           l4     = ~ w1 + w2 + w3,
-#'           expo   = NULL,
-#'           maxit  = 1000,
-#'           tol    = 1e-6,
-#'           Aitken = FALSE,
-#'           verbose= TRUE)
+#' mod1 <- BGR(modelName = "EE",
+#'             y = c("y1","y2"), data = fullsim,
+#'             f1 = ~ w1 + w2,
+#'             f2 = ~ w2 + w3,
+#'             f3 = ~ w1 + w2 + w3,
+#'             f4 = ~ w1 + w2 + w3,
+#'             verbose= FALSE)
+#' mod2 <- BGR(modelName = "EI",
+#'             y = c("y1","y2"), data = fullsim,
+#'             f1     = ~ w1 + w2,
+#'             f2     = ~ w2 + w3,
+#'             f3     = ~ w1 + w2 + w3,
+#'             verbose= FALSE)
+#' mod3 <- BGR(modelName = "IE",
+#'             y = c("y1","y2"), data = fullsim,
+#'             f4     = ~ w1 + w2 + w3,
+#'             verbose= FALSE)
+
 
 
 BGR <- function(modelName = c("EE","EI","IE"),
-                response,
+                y,
                 data,
-                l1,
-                l2,
-                l3,
-                l4,
-                expo=NULL,
+                f1,
+                f2,
+                f3,
+                f4,
                 maxit=100,
                 tol=1e-5,
-                Aitken = TRUE,
+                Aitken = FALSE,
                 verbose=TRUE){
-  if (modelName == "EE"){
-    # BGR.EE: all alpha's and beta are regressed on covariates
-    if (is.null(l1)){ stop("l1 must be supplied for EE model type") }
-    if (is.null(l2)){ stop("l2 must be supplied for EE model type") }
-    if (is.null(l3)){ stop("l3 must be supplied for EE model type") }
-    if (is.null(l4)){ stop("l4 must be supplied for EE model type") }
-    return(BGR.EE(data=data, response=response,
-                  l1=l1, l2=l2, l3=l3, l4=l4,
-                  expo=expo, maxit=maxit, tol=tol,
-                  Aitken = Aitken, verbose=verbose))
-  }
-  if (modelName == "EI"){
-    # BGR.EI: same beta for all observations
-    if (is.null(l1)){ stop("l1 must be supplied for EI model type") }
-    if (is.null(l2)){ stop("l2 must be supplied for EI model type") }
-    if (is.null(l3)){ stop("l3 must be supplied for EI model type") }
-    return(BGR.EI(data=data, response=response,
-                  l1=l1, l2=l2, l3=l3,
-                  expo=expo, maxit=maxit, tol=tol,
-                  Aitken=Aitken, verbose=verbose))
-  }
-  if (modelName == "IE"){
-    # BGR.IE: only beta is regressed on its covariates, not alpha
-    if (is.null(l4)){ stop("l4 must be supplied for IE model type") }
-    return(BGR.IE(data=data, response=response,
-                  l4=l4,
-                  expo=expo, maxit=maxit, tol=tol,
-                  Aitken=Aitken, verbose=verbose))
-  }
+  switch(modelName,
+         EE = {    # BGR.EE: all alpha's and beta are regressed on covariates
+           if (is.null(f1)){ stop("f1 must be supplied for EE model type") }
+           if (is.null(f2)){ stop("f2 must be supplied for EE model type") }
+           if (is.null(f3)){ stop("f3 must be supplied for EE model type") }
+           if (is.null(f4)){ stop("f4 must be supplied for EE model type") }
+           return(BGR.EE(data=data, y=y,
+                         f1=f1, f2=f2, f3=f3, f4=f4,
+                         maxit=maxit, tol=tol,
+                         verbose=verbose))
+           },
+         EI = {    # BGR.EI: same beta for all observations
+           if (is.null(f1)){ stop("f1 must be supplied for EI model type") }
+           if (is.null(f2)){ stop("f2 must be supplied for EI model type") }
+           if (is.null(f3)){ stop("f3 must be supplied for EI model type") }
+           return(BGR.EI(data=data, y=y,
+                         f1=f1, f2=f2, f3=f3,
+                         maxit=maxit, tol=tol,
+                         verbose=verbose))
+           },
+         IE = {# BGR.IE: only beta is regressed on its covariates, not alpha
+           if (is.null(f4)){ stop("f4 must be supplied for IE model type") }
+           return(BGR.IE(data=data, y=y,
+                         f4=f4,
+                         maxit=maxit, tol=tol,
+                         verbose=verbose))
+           },
+         stop("invalid model type name")
+         )
 }
 
 
 #' @rdname BGR
 
-BGR.EE <- function(data,
-                   response,
-                   l1,
-                   l2,
-                   l3,
-                   l4,
-                   expo   = NULL,
+BGR.EE <- function(y,
+                   data,
+                   f1,
+                   f2,
+                   f3,
+                   f4,
                    maxit  = 100,
                    tol    = 1e-5,
-                   Aitken = FALSE,
                    verbose= TRUE){
-  #------------------------------
   options(warn=-1)
-  tempcall <- as.call( c(expression(BGR), list(data    = substitute(data),
-                                               response= response,
-                                               l1      = l1,
-                                               l2      = l2,
-                                               l3      = l3,
-                                               l4      = l4,
-                                               expo    = expo,
-                                               maxit   = maxit,
-                                               tol     = tol,
-                                               Aitken  = Aitken,
-                                               verbose = verbose) ) )
-  #------------------------------
-  namey1 <- response[1]
-  namey2 <- response[2]
+  tempcall<-as.call(c(expression(BGR),list(y       = y,
+                                           data    = substitute(data),
+                                           f1      = f1,
+                                           f2      = f2,
+                                           f3      = f3,
+                                           f4      = f4,
+                                           maxit   = maxit,
+                                           tol     = tol,
+                                           verbose = verbose)))
+  namey1 <- y[1]
+  namey2 <- y[2]
   y1     <- data[,names(data)==namey1]
   y2     <- data[,names(data)==namey2]
   n      <- length(y1)
 
-  if (!is.null(expo)) {weight.var<-data[,names(data)==expo]} else {weight.var<-rep(1, n)}
-  data$weight.var <- weight.var # there should be better ways of doing this
+  newdata <- data;
+  newdata <- newdata[, names(newdata)!=namey1];
+  newdata <- newdata[, names(newdata)!=namey2]
 
-  data1 <- data;
-  data1 <- data1[, names(data1)!=namey1];
-  data1 <- data1[, names(data1)!=namey2]
-  datap <- data1
+  if (!is.null(f1)){
+    if (as.character(f1[2])=="."){
+      f1.new <- formula( paste( "x1", paste( names(newdata),'',collapse='+',sep='' ), sep='~'))
+    } else {f1.new <- formula(paste("x1", as.character(f1)[2], sep="~"))}
+  } else stop("f1 cannot be NULL, must be supplied")
+  if (!is.null(f2)){
+    if (as.character(f2[2])=="."){f2.new <- formula( paste( "x2", paste( names(newdata),'',collapse='+',sep='' ), sep='~'))}
+    else {f2.new <- formula(paste("x2", as.character(f2)[2], sep="~"))}
+  } else stop("f2 cannot be NULL, must be supplied")
+  if (!is.null(f3)){
+    if (as.character(f3[2])=="."){f3.new <- formula( paste( "x3", paste( names(newdata), "", collapse = "+", sep = ""), sep="~"))}
+    else {f3.new <- formula(paste("x3", as.character(f3)[2], sep="~"))}
+  } else stop("f3 cannot be NULL, must be supplied")
+  if (!is.null(f4)){
+    if (as.character(f4[2])=="."){f4.new <- formula( paste( "be", paste( names(newdata), "", collapse = "+", sep = ""), sep="~"))}
+    else {f4.new <- formula(paste("be", as.character(f4)[2], sep="~"))}
+  } else stop("f4 cannot be NULL, must be supplied")
 
-  if (!is.null(l1)){
-    if (as.character(l1[2])=="."){
-      l1.new <- formula( paste( "x1", paste( names(data1),'',collapse='+',sep='' ), sep='~'))
-    } else {l1.new <- formula(paste("x1", as.character(l1)[2], sep="~"))}
-  } else stop("l1 cannot be NULL, must be supplied")
-  if (!is.null(l2)){
-    if (as.character(l2[2])=="."){l2.new <- formula( paste( "x2", paste( names(data1),'',collapse='+',sep='' ), sep='~'))}
-    else {l2.new <- formula(paste("x2", as.character(l2)[2], sep="~"))}
-  } else stop("l2 cannot be NULL, must be supplied")
-  if (!is.null(l3)){
-    if (as.character(l3[2])=="."){l3.new <- formula( paste( "x3", paste( names(data1), "", collapse = "+", sep = ""), sep="~"))}
-    else {l3.new <- formula(paste("x3", as.character(l3)[2], sep="~"))}
-  } else stop("l3 cannot be NULL, must be supplied")
-  if (!is.null(l4)){
-    if (as.character(l4[2])=="."){l4.new <- formula( paste( "be", paste( names(data1), "", collapse = "+", sep = ""), sep="~"))}
-    else {l4.new <- formula(paste("be", as.character(l4)[2], sep="~"))}
-  } else stop("l4 cannot be NULL, must be supplied")
+  Model.Matrix.1   <- stats::model.matrix(f1.new[-2], data=newdata)
+  Model.Matrix.2   <- stats::model.matrix(f2.new[-2], data=newdata)
+  Model.Matrix.3   <- stats::model.matrix(f3.new[-2], data=newdata)
+  Model.Matrix.4   <- stats::model.matrix(f4.new[-2], data=newdata)
 
   #-----------------------------
   # starting values
   x3.start <- rep(0, n)
-  #set.seed(10)
   for (i in seq_len(n)){
     x3.start[i] <- runif(1, min=0, max=min(y1[i], y2[i]))
   }
   x1.start         <- y1 - x3.start
   x2.start         <- y2 - x3.start
-  data.start       <- data1
-  data.start$x1    <- x1.start
-  data.start$x2    <- x2.start
-  data.start$x3    <- x3.start
-  start.temp.glm.1 <- glm(l1.new, data=data.start, family=Gamma(link="log"))
-  start.temp.glm.2 <- glm(l2.new, data=data.start, family=Gamma(link="log"))
-  start.temp.glm.3 <- glm(l3.new, data=data.start, family=Gamma(link="log"))
-
-  Model.Matrix.1   <- model.matrix(start.temp.glm.1)
-  Model.Matrix.2   <- model.matrix(start.temp.glm.2)
-  Model.Matrix.3   <- model.matrix(start.temp.glm.3)
+  start.temp.glm.1 <- glm(x1.start~Model.Matrix.1[,-1], family=Gamma(link="log"))
+  start.temp.glm.2 <- glm(x2.start~Model.Matrix.2[,-1], family=Gamma(link="log"))
+  start.temp.glm.3 <- glm(x3.start~Model.Matrix.3[,-1], family=Gamma(link="log"))
   coef1.current    <- start.temp.glm.1$coefficient
   coef2.current    <- start.temp.glm.2$coefficient
   coef3.current    <- start.temp.glm.3$coefficient
-
-  alpha1.current   <- rep(1/summary(start.temp.glm.1)$dispersion, n) #rep(MASS::gamma.shape(start.temp.glm.1)$alpha, n)
-  alpha2.current   <- rep(1/summary(start.temp.glm.2)$dispersion, n) #rep(MASS::gamma.shape(start.temp.glm.2)$alpha, n)
-  alpha3.current   <- rep(1/summary(start.temp.glm.3)$dispersion, n) #rep(MASS::gamma.shape(start.temp.glm.3)$alpha, n)
-
-  beta.current.1   <- 1/summary(start.temp.glm.1)$dispersion / predict(start.temp.glm.1, type="response")#, dispersion = 1/MASS::gamma.shape(start.temp.glm.1) )
-  beta.current.2   <- 1/summary(start.temp.glm.2)$dispersion / predict(start.temp.glm.2, type="response")#, dispersion = 1/MASS::gamma.shape(start.temp.glm.2) )
-  beta.current.3   <- 1/summary(start.temp.glm.3)$dispersion / predict(start.temp.glm.3, type="response")#, dispersion = 1/MASS::gamma.shape(start.temp.glm.3) )
+  alpha1.current   <- rep(1/summary(start.temp.glm.1)$dispersion, n)
+  alpha2.current   <- rep(1/summary(start.temp.glm.2)$dispersion, n)
+  alpha3.current   <- rep(1/summary(start.temp.glm.3)$dispersion, n)
+  beta.current.1   <- 1/summary(start.temp.glm.1)$dispersion / stats::predict.glm(start.temp.glm.1, type="response")
+  beta.current.2   <- 1/summary(start.temp.glm.2)$dispersion / stats::predict.glm(start.temp.glm.2, type="response")
+  beta.current.3   <- 1/summary(start.temp.glm.3)$dispersion / stats::predict.glm(start.temp.glm.3, type="response")
   beta.current     <- rowMeans(cbind(beta.current.1, beta.current.2, beta.current.3))
-
-  data.start$be    <- beta.current
-  start.temp.glm.4 <- glm(l4.new, data=data.start, family=Gamma(link="log"))
+  start.temp.glm.4 <- glm(beta.current~Model.Matrix.4[,-1], family=Gamma(link="log"))
   coef4.current    <- start.temp.glm.4$coefficient
-  Model.Matrix.4   <- model.matrix(start.temp.glm.4)
 
-  # p1 <- dim(Model.Matrix.1)[2]
-  # p2 <- dim(Model.Matrix.2)[2]
-  # p3 <- dim(Model.Matrix.3)[2]
-  # p4 <- dim(Model.Matrix.4)[2]
   #--------------------------
   loglike.diff    <- 1000
   loglike.current <- -sqrt(.Machine$double.eps)
   loglike         <- rep(0,maxit)
-  loglike.store   <- rep(-.Machine$double.xmax, 3)
-  #if (is.null(l3)) stop("l3 is NULL, Double Gamma Regression")
-
-  coef1.trace  <- coef1.current
-  coef2.trace  <- coef2.current
-  coef3.trace  <- coef3.current
-  coef4.trace  <- coef4.current
-  alpha1.trace <- alpha1.current
-  alpha2.trace <- alpha2.current
-  alpha3.trace <- alpha3.current
-  beta.trace   <- beta.current
   j            <- 1
 
   while ( (loglike.diff > tol) && (j <= maxit) ) {
@@ -247,12 +217,7 @@ BGR.EE <- function(data,
 
     loglike.new    <- sum(den)
     loglike[j]     <- loglike.new
-    loglike.store  <- c(loglike.store[-1], loglike.new)
-    if (Aitken){
-      loglike.diff <- abs( MoEClust::MoE_aitken(loglike.store)$linf - loglike.current )
-    } else {
-      loglike.diff <- abs(loglike.new-loglike.current)/(1+abs(loglike.new))
-    }
+    loglike.diff <- abs(loglike.new-loglike.current)/(1+abs(loglike.new))
     if (verbose){
       cat(c("iter:", j, "; current loglike:", round(loglike.new,4), "; loglike change:", round(loglike.diff,6), "\n"))
     }
@@ -260,7 +225,6 @@ BGR.EE <- function(data,
     #--------
     # M step
     #--------
-
     beta.temp      <- (alpha1.current + alpha2.current + alpha3.current) / (Expected.x1 + Expected.x2 + Expected.x3)
     m4             <- glm(beta.temp ~ Model.Matrix.4[,-1], family=Gamma(link="log"))
     Q.b.function   <- function(coef){
@@ -341,14 +305,6 @@ BGR.EE <- function(data,
     alpha2.current <- alpha2.new
     alpha3.current <- alpha3.new
     beta.current   <- beta.new
-    alpha1.trace   <- cbind(alpha1.trace, alpha1.new)
-    alpha2.trace   <- cbind(alpha2.trace, alpha2.new)
-    alpha3.trace   <- cbind(alpha3.trace, alpha3.new)
-    beta.trace     <- cbind(beta.trace, beta.new)
-    coef1.trace    <- cbind(coef1.trace, coef1.new)
-    coef2.trace    <- cbind(coef2.trace, coef2.new)
-    coef3.trace    <- cbind(coef3.trace, coef3.new)
-    coef4.trace    <- cbind(coef4.trace, coef4.new)
     j              <- j+1
   }
 
@@ -367,145 +323,116 @@ BGR.EE <- function(data,
   y2.residual <- y2 - y2.fitted
 
   # formula
-  l1.formula <- formula(paste("", as.character(l1.new)[3], sep="~"))
-  l2.formula <- formula(paste("", as.character(l2.new)[3], sep="~"))
-  l3.formula <- formula(paste("", as.character(l3.new)[3], sep="~"))
-  l4.formula <- formula(paste("", as.character(l4.new)[3], sep="~"))
+  f1.formula <- formula(paste("", as.character(f1.new)[3], sep="~"))
+  f2.formula <- formula(paste("", as.character(f2.new)[3], sep="~"))
+  f3.formula <- formula(paste("", as.character(f3.new)[3], sep="~"))
+  f4.formula <- formula(paste("", as.character(f4.new)[3], sep="~"))
 
-  result<-list(coef        =list(l1.coef=coef1.new,
-                                 l2.coef=coef2.new,
-                                 l3.coef=coef3.new,
-                                 l4.coef=coef4.new),
-               alpha1      =alpha1.current,
-               alpha2      =alpha2.current,
-               alpha3      =alpha3.current,
-               beta        =beta.current,
-               trace       =list(alpha1.trace=alpha1.trace,
-                                 alpha2.trace=alpha2.trace,
-                                 alpha3.trace=alpha3.trace,
-                                 beta.trace  =beta.trace,
-                                 coef1.trace  =coef1.trace,
-                                 coef2.trace  =coef2.trace,
-                                 coef3.trace  =coef3.trace,
-                                 coef4.trace  =coef4.trace),
-               fitted      =data.frame(y1=y1.fitted,
-                                       y2=y2.fitted),
-               loglike     =loglike[j-1],
-               llseq       = loglike[1:(j-1)],
-
-               param.number= noparams,
+  result<-list(modelName   = "EE",
+               coefficients= list(f1.coef=coef1.new,
+                                  f2.coef=coef2.new,
+                                  f3.coef=coef3.new,
+                                  f4.coef=coef4.new),
+               alpha1      = alpha1.current,
+               alpha2      = alpha2.current,
+               alpha3      = alpha3.current,
+               beta        = beta.current,
+               fitted.values= data.frame(y1 = y1.fitted,
+                                         y2 = y2.fitted),
+               residuals   = cbind(y1.residual, y2.residual),
+               loglike     = loglike[j-1],
+               ll          = loglike[1:(j-1)],
+               df          = noparams,
                AIC         = AIC,
                BIC         = BIC,
-
                y           = cbind(y1, y2),
-               Model.Matrix= list(Model.Matrix.1, Model.Matrix.2, Model.Matrix.3),
-               formula     = list(l1.formula, l2.formula, l3.formula, l4.formula),
-
+               n           = n,
+               Model.Matrix= list(Model.Matrix.1,
+                                  Model.Matrix.2,
+                                  Model.Matrix.3,
+                                  Model.Matrix.4),
+               formula     = list(f1.formula,
+                                  f2.formula,
+                                  f3.formula,
+                                  f4.formula),
                call        = tempcall,
-               iter        = j-1)
+               iter        = (j-1))
   options(warn=0)
-  class(result)<-c('BGR.EE', 'glm')
-  return(result)
+  structure(result, class = c('BGR'))
 }
 
 #' @rdname BGR
 
-BGR.EI <- function(data,
-                   response,
-                   l1,
-                   l2,
-                   l3,
-                   expo   = NULL,
+BGR.EI <- function(y,
+                   data,
+                   f1,
+                   f2,
+                   f3,
                    maxit  = 100,
                    tol    = 1e-5,
-                   Aitken = FALSE,
                    verbose= TRUE){
-  #------------------------------
   options(warn=-1)
-  tempcall <- as.call( c(expression(BGR), list(data    = substitute(data),
-                                               response= response,
-                                               l1      = l1,
-                                               l2      = l2,
-                                               l3      = l3,
-                                               expo    = expo,
+  tempcall <- as.call( c(expression(BGR), list(y       = y,
+                                               data    = substitute(data),
+                                               f1      = f1,
+                                               f2      = f2,
+                                               f3      = f3,
                                                maxit   = maxit,
                                                tol     = tol,
-                                               Aitken  = Aitken,
                                                verbose = verbose) ) )
-  #------------------------------
-  namey1 <- response[1]
-  namey2 <- response[2]
+  namey1 <- y[1]
+  namey2 <- y[2]
   y1     <- data[,names(data)==namey1]
   y2     <- data[,names(data)==namey2]
   n      <- length(y1)
 
-  if (!is.null(expo)) {weight.var<-data[,names(data)==expo]} else {weight.var<-rep(1, n)}
-  data$weight.var <- weight.var # there should be better ways of doing this
+  newdata <- data
+  newdata <- newdata[, names(newdata)!=namey1]
+  newdata <- newdata[, names(newdata)!=namey2]
 
-  if (!is.null(l1)){
-    if (as.character(l1[2])=="."){
-      l1.new <- formula( paste( "x1", paste( names(data1),'',collapse='+',sep='' ), sep='~'))
-    } else {l1.new <- formula(paste("x1", as.character(l1)[2], sep="~"))}
-  } else stop("l1 cannot be NULL, must be supplied")
-  if (!is.null(l2)){
-    if (as.character(l2[2])=="."){l2.new <- formula( paste( "x2", paste( names(data1),'',collapse='+',sep='' ), sep='~'))}
-    else {l2.new <- formula(paste("x2", as.character(l2)[2], sep="~"))}
-  } else stop("l2 cannot be NULL, must be supplied")
-  if (!is.null(l3)){
-    if (as.character(l3[2])=="."){l3.new <- formula( paste( "x3", paste( names(data1), "", collapse = "+", sep = ""), sep="~"))}
-    else {l3.new <- formula(paste("x3", as.character(l3)[2], sep="~"))}
-  } else stop("l3 cannot be NULL, must be supplied")
+  if (!is.null(f1)){
+    if (as.character(f1[2])=="."){
+      f1.new <- formula( paste( "x1", paste( names(newdata),'',collapse='+',sep='' ), sep='~'))
+    } else {f1.new <- formula(paste("x1", as.character(f1)[2], sep="~"))}
+  } else stop("f1 cannot be NULL, must be supplied")
+  if (!is.null(f2)){
+    if (as.character(f2[2])=="."){f2.new <- formula( paste( "x2", paste( names(newdata),'',collapse='+',sep='' ), sep='~'))}
+    else {f2.new <- formula(paste("x2", as.character(f2)[2], sep="~"))}
+  } else stop("f2 cannot be NULL, must be supplied")
+  if (!is.null(f3)){
+    if (as.character(f3[2])=="."){f3.new <- formula( paste( "x3", paste( names(newdata), "", collapse = "+", sep = ""), sep="~"))}
+    else {f3.new <- formula(paste("x3", as.character(f3)[2], sep="~"))}
+  } else stop("f3 cannot be NULL, must be supplied")
 
-  data1 <- data;
-  data1<-data1[, names(data1)!=namey1];
-  data1<-data1[, names(data1)!=namey2]
-  datap <- data1
-
+  Model.Matrix.1 <- stats::model.matrix(f1.new[-2], data=newdata)
+  Model.Matrix.2 <- stats::model.matrix(f2.new[-2], data=newdata)
+  Model.Matrix.3 <- stats::model.matrix(f3.new[-2], data=newdata)
   #-----------------------------
   # starting values
   x3.start <- rep(0, n)
-  #set.seed(10)
   for (i in seq_len(n)){
     x3.start[i] <- runif(1, min=0, max=min(y1[i], y2[i]))
   }
   x1.start       <- y1 - x3.start
   x2.start       <- y2 - x3.start
-  data.start     <- data1
-  data.start$x1  <- x1.start
-  data.start$x2  <- x2.start
-  data.start$x3  <- x3.start
-  start.temp.glm.1 <- glm(l1.new, data=data.start, family=Gamma(link="log"))
-  start.temp.glm.2 <- glm(l2.new, data=data.start, family=Gamma(link="log"))
-  start.temp.glm.3 <- glm(l3.new, data=data.start, family=Gamma(link="log"))
-  Model.Matrix.1 <- stats::model.matrix(start.temp.glm.1)
-  Model.Matrix.2 <- stats::model.matrix(start.temp.glm.2)
-  Model.Matrix.3 <- stats::model.matrix(start.temp.glm.3)
+  start.temp.glm.1 <- glm(x1.start~Model.Matrix.1[,-1], family=Gamma(link="log"))
+  start.temp.glm.2 <- glm(x2.start~Model.Matrix.2[,-1], family=Gamma(link="log"))
+  start.temp.glm.3 <- glm(x3.start~Model.Matrix.3[,-1], family=Gamma(link="log"))
   coef1.current  <- start.temp.glm.1$coefficient
   coef2.current  <- start.temp.glm.2$coefficient
   coef3.current  <- start.temp.glm.3$coefficient
-
-  alpha1.current <- rep(1/summary(start.temp.glm.1)$dispersion, n) #rep(MASS::gamma.shape(start.temp.glm.1)$alpha, n)
-  alpha2.current <- rep(1/summary(start.temp.glm.2)$dispersion, n) #rep(MASS::gamma.shape(start.temp.glm.2)$alpha, n)
-  alpha3.current <- rep(1/summary(start.temp.glm.3)$dispersion, n) #rep(MASS::gamma.shape(start.temp.glm.3)$alpha, n)
-  beta.current.1 <- 1/summary(start.temp.glm.1)$dispersion / predict(start.temp.glm.1, type="response")#, dispersion = 1/MASS::gamma.shape(start.temp.glm.1) )
-  beta.current.2 <- 1/summary(start.temp.glm.2)$dispersion / predict(start.temp.glm.2, type="response")#, dispersion = 1/MASS::gamma.shape(start.temp.glm.2) )
-  beta.current.3 <- 1/summary(start.temp.glm.3)$dispersion / predict(start.temp.glm.3, type="response")#, dispersion = 1/MASS::gamma.shape(start.temp.glm.3) )
+  alpha1.current <- rep(1/summary(start.temp.glm.1)$dispersion, n)
+  alpha2.current <- rep(1/summary(start.temp.glm.2)$dispersion, n)
+  alpha3.current <- rep(1/summary(start.temp.glm.3)$dispersion, n)
+  beta.current.1 <- 1/summary(start.temp.glm.1)$dispersion / stats::predict.glm(start.temp.glm.1, type="response")
+  beta.current.2 <- 1/summary(start.temp.glm.2)$dispersion / stats::predict.glm(start.temp.glm.2, type="response")
+  beta.current.3 <- 1/summary(start.temp.glm.3)$dispersion / stats::predict.glm(start.temp.glm.3, type="response")
   beta.current   <- mean(cbind(beta.current.1, beta.current.2, beta.current.3))
   #--------------------------
 
   loglike.diff    <- 1000
   loglike.current <- -sqrt(.Machine$double.eps)
   loglike         <- rep(0,maxit)
-  loglike.store   <- rep(-.Machine$double.xmax, 3)
-  #if (is.null(l3)) stop("l3 is NULL, Double Gamma Regression")
-
-  coef1.trace  <- coef1.current
-  coef2.trace  <- coef2.current
-  coef3.trace  <- coef3.current
-  alpha1.trace <- alpha1.current
-  alpha2.trace <- alpha2.current
-  alpha3.trace <- alpha3.current
-  beta.trace   <- beta.current
   j            <- 1
 
   while ( (loglike.diff > tol) && (j <= maxit) ) {
@@ -543,12 +470,7 @@ BGR.EI <- function(data,
 
     loglike.new    <- sum(den)
     loglike[j]     <- loglike.new
-    loglike.store  <- c(loglike.store[-1], loglike.new)
-    if (Aitken){
-      loglike.diff <- abs( MoEClust::MoE_aitken(loglike.store)$linf - loglike.current )
-    } else {
-      loglike.diff <- abs(loglike.new-loglike.current)/(1+abs(loglike.new))
-    }
+    loglike.diff <- abs(loglike.new-loglike.current)/(1+abs(loglike.new))
     if (verbose){
       cat(c("iter:", j, "; current loglike:", round(loglike.new,4), "; loglike change:", round(loglike.diff,6), "\n"))
     }
@@ -563,7 +485,6 @@ BGR.EI <- function(data,
         sum( exp(coef%*%t(Model.Matrix)) * Expected.logs )
       return(q.res)
     }
-
     m1             <- glm(alpha1.current~Model.Matrix.1[,-1], family=Gamma(link="log"))
     coef1.new      <- optim(par          = as.vector(m1$coefficients),
                             fn           = Q.function,
@@ -603,34 +524,20 @@ BGR.EI <- function(data,
       cat(c("beta:",   round(beta.new,4) , "\n"))
     }
 
+    loglike.current<- loglike.new
     coef1.current  <- coef1.new
     coef2.current  <- coef2.new
     coef3.current  <- coef3.new
-
-    loglike.current<- loglike.new
-
     alpha1.current <- alpha1.new
     alpha2.current <- alpha2.new
     alpha3.current <- alpha3.new
     beta.current   <- beta.new
-
-    alpha1.trace   <- cbind(alpha1.trace, alpha1.new)
-    alpha2.trace   <- cbind(alpha2.trace, alpha2.new)
-    alpha3.trace   <- cbind(alpha3.trace, alpha3.new)
-    beta.trace     <- c(beta.trace, beta.new)
-    coef1.trace    <- cbind(coef1.trace, coef1.new)
-    coef2.trace    <- cbind(coef2.trace, coef2.new)
-    coef3.trace    <- cbind(coef3.trace, coef3.new)
-
     j              <- j+1
-
   }
 
   if (!all(loglike[1:(j-1)] == cummax(loglike[1:(j-1)]))){
     cat("Loglikelihood is not monotonically increasing!", "\n")
   }
-
-
   noparams <- m1$rank + m2$rank + m3$rank + 1
   AIC      <- -2*loglike[j-1] + noparams * 2
   BIC      <- -2*loglike[j-1] + noparams * log(n)
@@ -642,87 +549,74 @@ BGR.EI <- function(data,
   y2.residual <- y2 - y2.fitted
 
   # formula
-  l1.formula <- formula(paste("", as.character(l1.new)[3], sep="~"))
-  l2.formula <- formula(paste("", as.character(l2.new)[3], sep="~"))
-  l3.formula <- formula(paste("", as.character(l3.new)[3], sep="~"))
+  f1.formula <- formula(paste("", as.character(f1.new)[3], sep="~"))
+  f2.formula <- formula(paste("", as.character(f2.new)[3], sep="~"))
+  f3.formula <- formula(paste("", as.character(f3.new)[3], sep="~"))
 
-  result<-list(coef        =list(l1.coef=coef1.new,
-                                 l2.coef=coef2.new,
-                                 l3.coef=coef3.new),
-               alpha1      =alpha1.current,
-               alpha2      =alpha2.current,
-               alpha3      =alpha3.current,
-               beta        =beta.current,
-               trace       =list(alpha1.trace=alpha1.trace,
-                                 alpha2.trace=alpha2.trace,
-                                 alpha3.trace=alpha3.trace,
-                                 beta.trace  =beta.trace,
-                                 coef1.trace =coef1.trace,
-                                 coef2.trace =coef2.trace,
-                                 coef3.trace =coef3.trace),
-               fitted      =data.frame(y1=y1.fitted,
-                                       y2=y2.fitted),
-               loglike     =loglike[j-1],
-               llseq       = loglike[1:(j-1)],
-
-               param.number=noparams,
+  result<-list(modelName   = "EI",
+               coefficients= list(f1.coef=coef1.new,
+                                  f2.coef=coef2.new,
+                                  f3.coef=coef3.new),
+               alpha1      = alpha1.current,
+               alpha2      = alpha2.current,
+               alpha3      = alpha3.current,
+               beta        = beta.current,
+               fitted.values=data.frame(y1=y1.fitted,
+                                        y2=y2.fitted),
+               residuals   = cbind(y1.residual, y2.residual),
+               loglike     = loglike[j-1],
+               ll          = loglike[1:(j-1)],
+               df          = noparams,
                AIC         = AIC,
                BIC         = BIC,
-
                y           = cbind(y1, y2),
-               Model.Matrix= list(Model.Matrix.1, Model.Matrix.2, Model.Matrix.3),
-               formula     = list(l1.formula, l2.formula, l3.formula),
-
+               n           = n,
+               Model.Matrix= list(Model.Matrix.1,
+                                  Model.Matrix.2,
+                                  Model.Matrix.3),
+               formula     = list(f1.formula,
+                                  f2.formula,
+                                  f3.formula),
                call        = tempcall,
                iter        = j-1)
   options(warn=0)
-  class(result)<-c('BGR.EI', 'glm')
-  return(result)
+  structure(result, class = c('BGR'))
 }
 
 #' @rdname BGR
 
-BGR.IE <- function(data,
-                   response,
-                   l4,
-                   expo   = NULL,
+BGR.IE <- function(y,
+                   data,
+                   f4,
                    maxit  = 100,
                    tol    = 1e-5,
-                   Aitken = FALSE,
                    verbose= TRUE){
-  #------------------------------
   options(warn=-1)
-  tempcall <- as.call( c(expression(BGR), list(data    = substitute(data),
-                                               response= response,
-                                               l4      = l4,
-                                               expo    = expo,
-                                               maxit   = maxit,
-                                               tol     = tol,
-                                               Aitken  = Aitken,
-                                               verbose = verbose) ) )
-  #------------------------------
-  namey1 <- response[1]
-  namey2 <- response[2]
+  tempcall<-as.call(c(expression(BGR),list(y       = y,
+                                           data    = substitute(data),
+                                           f4      = f4,
+                                           maxit   = maxit,
+                                           tol     = tol,
+                                           verbose = verbose) ) )
+  namey1 <- y[1]
+  namey2 <- y[2]
   y1     <- data[,names(data)==namey1]
   y2     <- data[,names(data)==namey2]
   n      <- length(y1)
 
-  if (!is.null(expo)) {weight.var<-data[,names(data)==expo]} else {weight.var<-rep(1, n)}
-  data$weight.var <- weight.var
+  newdata <- data
+  newdata <- newdata[,names(newdata)!=namey1]
+  newdata <- newdata[,names(newdata)!=namey2]
 
-  data1 <- data;
-  data1 <- data1[,names(data1)!=namey1];
-  data1 <- data1[,names(data1)!=namey2]
-  datap <- data1
+  if (!is.null(f4)){
+    if (as.character(f4[2])=="."){f4.new <- formula( paste( "be", paste( names(newdata), "", collapse = "+", sep = ""), sep="~"))}
+    else {f4.new <- formula(paste("be", as.character(f4)[2], sep="~"))}
+  } else stop("f4 cannot be NULL, must be supplied")
 
-  if (!is.null(l4)){
-    if (as.character(l4[2])=="."){l4.new <- formula( paste( "be", paste( names(data1), "", collapse = "+", sep = ""), sep="~"))}
-    else {l4.new <- formula(paste("be", as.character(l4)[2], sep="~"))}
-  } else stop("l4 cannot be NULL, must be supplied")
-
+  Model.Matrix.4   <- stats::model.matrix(f4.new[-2], data=newdata)
   #-----------------------------
   # starting values
-  x3.start <- rep(0, n) # set.seed(10)
+  x3.start <- rep(0, n)
   for (i in seq_len(n)){
     x3.start[i] <- runif(1, min=0, max=min(y1[i], y2[i]))
   }
@@ -733,29 +627,16 @@ BGR.IE <- function(data,
   alpha2.current   <- MASS::fitdistr(x1.start, "gamma")$estimate[1]
   alpha3.current   <- MASS::fitdistr(x1.start, "gamma")$estimate[1]
   beta.current     <- rowMeans(cbind(alpha1.current/x1.start, alpha2.current/x2.start, alpha3.current/x3.start))
-
-  data.start       <- data1
-  data.start$be    <- beta.current
-  start.temp.glm   <- glm(l4.new, data=data.start, family=Gamma(link="log"))
+  start.temp.glm   <- glm(beta.current~Model.Matrix.4[,-1], family=Gamma(link="log"))
   coef4.current    <- start.temp.glm$coefficient
-  Model.Matrix.4   <- model.matrix(start.temp.glm)
-
   #--------------------------
 
   loglike.diff    <- 1000
   loglike.current <- -sqrt(.Machine$double.eps)
   loglike         <- rep(0,maxit)
-  loglike.store   <- rep(-.Machine$double.xmax, 3)
-
-  coef4.trace  <- coef4.current
-  alpha1.trace <- alpha1.current
-  alpha2.trace <- alpha2.current
-  alpha3.trace <- alpha3.current
-  beta.trace   <- beta.current
   j            <- 1
 
   while ( (loglike.diff > tol) && (j <= maxit) ) {
-
     #-------
     #E step
     #-------
@@ -787,12 +668,7 @@ BGR.IE <- function(data,
 
     loglike.new    <- sum(den)
     loglike[j]     <- loglike.new
-    loglike.store  <- c(loglike.store[-1], loglike.new)
-    if (Aitken){
-      loglike.diff <- abs( MoEClust::MoE_aitken(loglike.store)$linf - loglike.current )
-    } else {
-      loglike.diff <- abs(loglike.new-loglike.current)/(1+abs(loglike.new))
-    }
+    loglike.diff <- abs(loglike.new-loglike.current)/(1+abs(loglike.new))
     if (verbose){
       cat(c("iter:", j, "; current loglike:", round(loglike.new,4), "; loglike change:", round(loglike.diff,6), "\n"))
     }
@@ -839,7 +715,6 @@ BGR.IE <- function(data,
                           upper=100000,
                           tol = sqrt(.Machine$double.xmin),
                           check.conv = TRUE)$root
-
     if (verbose){
       cat(c("alpha1:", round(alpha1.new,4), "\n"))
       cat(c("alpha2:", round(alpha2.new,4), "\n"))
@@ -853,18 +728,12 @@ BGR.IE <- function(data,
     alpha2.current <- alpha2.new
     alpha3.current <- alpha3.new
     beta.current   <- beta.new
-    alpha1.trace   <- cbind(alpha1.trace, alpha1.new)
-    alpha2.trace   <- cbind(alpha2.trace, alpha2.new)
-    alpha3.trace   <- cbind(alpha3.trace, alpha3.new)
-    beta.trace     <- cbind(beta.trace, beta.new)
-    coef4.trace    <- cbind(coef4.trace, coef4.new)
     j              <- j+1
   }
 
   if (!all(loglike[1:(j-1)] == cummax(loglike[1:(j-1)]))){
     cat("Loglikelihood is not monotonically increasing!", "\n")
   }
-
 
   noparams<- m4$rank + 3
   AIC     <- -2*loglike[j-1] + noparams * 2
@@ -877,39 +746,41 @@ BGR.IE <- function(data,
   y2.residual <- y2 - y2.fitted
 
   # formula
-  l4.formula <- formula(paste("", as.character(l4.new)[3], sep="~"))
+  f4.formula <- formula(paste("", as.character(f4.new)[3], sep="~"))
 
-  result<-list(coef        =list(l4.coef=coef4.new),
-               alpha1      =alpha1.current,
-               alpha2      =alpha2.current,
-               alpha3      =alpha3.current,
-               beta        =beta.current,
-               trace       =list(alpha1.trace=alpha1.trace,
-                                 alpha2.trace=alpha2.trace,
-                                 alpha3.trace=alpha3.trace,
-                                 beta.trace  =beta.trace,
-                                 coef.trace  =coef4.trace),
-               fitted      =data.frame(y1=y1.fitted,
-                                       y2=y2.fitted),
-               loglike     =loglike[j-1],
-               llseq       = loglike[1:(j-1)],
-
-               param.number=noparams,
+  result<-list(modelName   = "IE",
+               coefficients= coef4.new,
+               alpha1      = alpha1.current,
+               alpha2      = alpha2.current,
+               alpha3      = alpha3.current,
+               beta        = beta.current,
+               fitted.values= data.frame(y1=y1.fitted,
+                                         y2=y2.fitted),
+               residuals   = cbind(y1.residual, y2.residual),
+               loglike     = loglike[j-1],
+               ll          = loglike[1:(j-1)],
+               df          = noparams,
                AIC         = AIC,
                BIC         = BIC,
-
                y           = cbind(y1, y2),
-               Model.Matrix= list(Model.Matrix.4),
-               formula     = list(l4.formula),
-
+               n           = n,
+               Model.Matrix= Model.Matrix.4,
+               formula     = f4.formula,
                call        = tempcall,
                iter        = j-1)
   options(warn=0)
-  class(result)<-c('BGR.IE', 'glm')
-  return(result)
+  structure(result, class = c('BGR'))
 }
 
 
+print.BGR <- function (x, ...){
+  txt <- paste0("'", class(x)[1], "' model of type '", x$modelName, "'")
+  cat(txt, "\n")
+  cat("\n")
+  cat("Available components:\n")
+  print(names(x))
+  invisible(x)
+}
 
 
 

@@ -1,5 +1,6 @@
-#' @title Density of bivariate gamma distribution given parameters values
-#' @description Density of bivariate gamma distribution given parameters values
+#' Density of Bivariate Gamma Distribution
+#'
+#' Density of bivariate gamma distribution given parameters values
 #'
 #' @param y vector of quantiles
 #' @param alpha vector of alpha values in bivariate gamma distribution
@@ -9,9 +10,9 @@
 #' @export
 #'
 #' @example
-#' dbivgamma(c(1,1), alpha=c(.3,.4,.5), beta=1, log = TRUE)
+#' dbivgamma(c(1,1), alpha=c(0.3, 0.4, 0.5), beta=1, log = TRUE)
 #'
-#'
+#' \dontrun{
 #' c1 <- seq(0, 15, by=0.1)[-1]
 #' c2 <- seq(0, 15, by=0.1)[-1]
 #' restable <- matrix(0, nrow = length(c1), ncol=length(c2))
@@ -20,13 +21,13 @@
 #'    restable[i,j] <- dbivgamma(c(c1[i], c2[j]),
 #'                               alpha = c(0.5,0.5,0.5),
 #'                               beta = 1,log=TRUE)
-#'  }
-#' }
+#'  } }
 #' rownames(restable) <- NULL
 #' colnames(restable) <- NULL
 #' require(lattice)
 #' new.palette=colorRampPalette(c("white","yellow","red"),space="rgb")
 #' levelplot(restable, col.regions=new.palette(20), xlab="Y_1", ylab="Y_2")
+#' }
 
 dbivgamma <- function(y, alpha, beta, log=FALSE){
   y1 <- y[1]
@@ -63,26 +64,4 @@ dbivgamma <- function(y, alpha, beta, log=FALSE){
     if (abs(log.int)!=Inf) {return(list("value"=log.int, "message"="using log-integral approximation"))} else {
       stop("error in dbivgamma: logIntegrate function")
     }}
-}
-
-
-LogSimpson <- function(logfun, lower, upper, n=100) {
-  # numerical integral using Simpson's rule
-  # assume lower < upper and n is an even positive integer
-  h <- (upper-lower)/n
-  x <- seq(lower, upper, by=h)
-  if (n == 2) {
-    s <- matrixStats::logSumExp(c(logfun(x[1]), logfun(x[2]), logfun(x[2]), logfun(x[2]), logfun(x[2]), logfun(x[3])))
-  } else {
-    s <- matrixStats::logSumExp(c(logfun(x[1]),
-                                  logfun(x[n+1]),
-                                  logfun(x[seq(2,n,by=2)]),
-                                  logfun(x[seq(2,n,by=2)]),
-                                  logfun(x[seq(3,n-1, by=2)]),
-                                  logfun(x[seq(3,n-1, by=2)]),
-                                  logfun(x[seq(3,n-1, by=2)]),
-                                  logfun(x[seq(3,n-1, by=2)])))
-  }
-  s <- log(h)-log(3) + s
-  return(s)
 }

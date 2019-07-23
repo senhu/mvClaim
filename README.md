@@ -1,24 +1,27 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-mvClaim R package
-=================
 
-Mixture of Experts model with bivariate gamma and bivariate Poisson distributions
+# mvClaim R package
 
-Description
------------
+Mixture of experts model with bivariate gamma distributions
 
-The `mvClaim` package provides a flexible modelling framework of mixture of experts (MoE) using bivariate gamma distributions, as introduced in Hu et al. (2019). It implements the bivariate gamma distribution proposed by Cheriyan (1941) and Ramabhadran (1951), which has not received much attention in the past. Depends on the parameterization of the framework, its interpretation, and model parsimony issue, a family of models are implemented including:
+## Description
 
--   Bivariate gamma distribution estimation
--   Bivariate gamma regression
--   Mixture of bivariate gamma clustering
--   Mixture of bivariate gamma regressions (i.e. mixture of bivariate gamma clustering with covariates)
+The `mvClaim` package provides a flexible modelling framework of mixture
+of experts (MoE) using bivariate gamma distributions, as introduced in
+Hu et al (2019). It implements the bivariate gamma distribution proposed
+by Cheriyan (1941) and Ramabhadran (1951), which has not received much
+attention in the past. Depends on the parameterization of the framework,
+its interpretation, and model parsimony issue, a family of models are
+implemented including:
 
-Previous works in the literature have been investigated for bivariate and multivariate Poisson distribution which was constructed in a similar fashion, hence a framework of MoE using bivariate Poisson is also included in this package.
+  - Bivariate gamma distribution estimation
+  - Bivariate gamma regression
+  - Mixture of bivariate gamma clustering
+  - Mixture of bivariate gamma regressions (i.e. mixture of bivariate
+    gamma clustering with covariates)
 
-Installation
-------------
+## Installation
 
 You can install the latest development version of `mvClaim` from GitHub:
 
@@ -33,48 +36,64 @@ Then the package can be loaded with:
 library(mvClaim)
 ```
 
-Artificial Data Example
------------------------
+## Artificial Data Example
 
-Instead of a package vignette document, here an example is briefly demonstrated using a simulated data set called `gatingsim` as illustrated in the paper (Hu et al. 2019). The data were simulated based on a gating network MoE, i.e. covariates were used only in the gating network to assist with identifying which component the observation was from. The pairwise plot of the data is shown below. <img src="man/figures/README-unnamed-chunk-1-1.png" width="100%" />
+This README file follows a package vignette format, and an example is
+briefly demonstrated using a simulated data set called `gatingsim` as
+illustrated in Hu et al (2019). The data were simulated based on a
+gating network MoE, i.e. covariates were used only in the gating network
+to assist with identifying which component the observation was from. The
+pairwise plot of the data is shown below.
+<img src="man/figures/README-unnamed-chunk-1-1.png" width="100%" />
 
-First without considering covariates, assuming there is only one bivariate gamma distribution and no mixtures, the distribution parameters can be estimated by
+First without considering covariates, assuming there is only one
+bivariate gamma distribution and no mixtures, the distribution
+parameters can be estimated via
 
 ``` r
 dist.est <- BGE(gatingsim[,1:2])
 ```
 
-or equivalently
+Still without considering covariates, if assuming that the data are a
+mixture of two bivariate gamma distributions, there are three model
+types within this bivariate gamma MoE family: “CC”, “CI” and “IC”.
+Suppose the model type is “CC”, the mixture model can be fitted via:
 
 ``` r
-dist.est <- MBGC(gatingsim[,1:2], G=1)
+mod1 <- MBGC(modelName = "CC", y=c("y1","y2"),
+             G=2, gating = "C", data=gatingsim)
 ```
 
-If assuming that the data are a mixture of two bivariate gamma distributions:
+When taking covariates into consideration, we know the true data
+generating process, based on which the optimal model can be fitted via
 
 ``` r
-clust2 <- MBGC(gatingsim[,1:2], G=2)
+mod2 <- MBGC(modelName = "CC", y=c("y1","y2"),
+             G=2, gating = ~w1+w2+w3, data=gatingsim)
 ```
 
-When taking covariates into consideration, since we know the true data generating process, the optimal model can be fitted by
+Although it is not the case that for the true data generating process
+covariates only appear in the gating network, in cases when covariates
+also enter all gating and expert networks, a model can be fitted via
 
 ``` r
-mod1 <- MBGR_Gating(response=c("y1", "y2"), G=2, 
-                    lp=~w1+w2+w3, data=gatingsim)
+mod3 <- MBGR(modelName = "VV", y=c("y1","y2"),
+             G=2, data = fullsim,
+             f1     = ~ w1 + w2 + w3,
+             f2     = ~ w1 + w2 + w3,
+             f3     = ~ w1 + w2 + w3,
+             f4     = ~ w1 + w2 + w3,
+             gating = ~ w1 + w2 + w3)
 ```
 
-Typically model selection issue needs to be addressed if the true model is unknown. We recommend a stepwise forwaard selection starting from a null model, i.e. fitting one bivariate gamma distribution without covariates. For example, in cases when covariates entering all gating and expert networks, a model can be fitted as
+In such cases, there are 9 different model types: “VC”, “VI”, “VV”,
+“VE”, “CV”, “IV”, “EV”, “EC”, “CE”. Typically model selection issue
+needs to be addressed if the true model is unknown. We recommend a
+stepwise forward selection starting from a null model, i.e. fitting one
+bivariate gamma distribution without covariates. More details can be
+found in Hu et al (2019).
 
-``` r
-mod2 <- MBGR4(data=gatingsim, G=2, 
-              l1=y1~w1+w2+w3, 
-              l2=y2~w1+w2+w3, 
-              l3=~w1+w2+w3, 
-              l4=~w1+w2+w3, 
-              lp=~w1+w2+w3)
-```
+## Reference
 
-Reference
----------
-
-Hu, S., Murphy, T. B. and O'Hagan, A. (2019) Bivariate Gamma Mixture of Experts Models for Joint Claims Modeling. To appear.
+Hu, S., Murphy, T. B. and O’Hagan, A. (2019) Bivariate Gamma Mixture of
+Experts Models for Joint Claims Modeling. To appear.
