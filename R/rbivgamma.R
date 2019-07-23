@@ -15,9 +15,9 @@ rbivgamma <- function(n, alpha, beta){
   alpha1 <- alpha[1]
   alpha2 <- alpha[2]
   alpha3 <- alpha[3]
-  g1 <- rgamma(n, alpha1, beta)
-  g2 <- rgamma(n, alpha2, beta)
-  g3 <- rgamma(n, alpha3, beta)
+  g1 <- stats::rgamma(n, alpha1, beta)
+  g2 <- stats::rgamma(n, alpha2, beta)
+  g3 <- stats::rgamma(n, alpha3, beta)
   y1 <- g1+g3; y2 <- g2+g3
   return(cbind(y1,y2))
 }

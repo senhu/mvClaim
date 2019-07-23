@@ -163,9 +163,9 @@ BGR.EE <- function(y,
   }
   x1.start         <- y1 - x3.start
   x2.start         <- y2 - x3.start
-  start.temp.glm.1 <- glm(x1.start~Model.Matrix.1[,-1], family=Gamma(link="log"))
-  start.temp.glm.2 <- glm(x2.start~Model.Matrix.2[,-1], family=Gamma(link="log"))
-  start.temp.glm.3 <- glm(x3.start~Model.Matrix.3[,-1], family=Gamma(link="log"))
+  start.temp.glm.1 <- stats::glm(x1.start~Model.Matrix.1[,-1], family=Gamma(link="log"))
+  start.temp.glm.2 <- stats::glm(x2.start~Model.Matrix.2[,-1], family=Gamma(link="log"))
+  start.temp.glm.3 <- stats::glm(x3.start~Model.Matrix.3[,-1], family=Gamma(link="log"))
   coef1.current    <- start.temp.glm.1$coefficient
   coef2.current    <- start.temp.glm.2$coefficient
   coef3.current    <- start.temp.glm.3$coefficient
@@ -176,7 +176,7 @@ BGR.EE <- function(y,
   beta.current.2   <- 1/summary(start.temp.glm.2)$dispersion / stats::predict.glm(start.temp.glm.2, type="response")
   beta.current.3   <- 1/summary(start.temp.glm.3)$dispersion / stats::predict.glm(start.temp.glm.3, type="response")
   beta.current     <- rowMeans(cbind(beta.current.1, beta.current.2, beta.current.3))
-  start.temp.glm.4 <- glm(beta.current~Model.Matrix.4[,-1], family=Gamma(link="log"))
+  start.temp.glm.4 <- stats::glm(beta.current~Model.Matrix.4[,-1], family=Gamma(link="log"))
   coef4.current    <- start.temp.glm.4$coefficient
 
   #--------------------------
@@ -229,13 +229,13 @@ BGR.EE <- function(y,
     # M step
     #--------
     beta.temp      <- (alpha1.current + alpha2.current + alpha3.current) / (Expected.x1 + Expected.x2 + Expected.x3)
-    m4             <- glm(beta.temp ~ Model.Matrix.4[,-1], family=Gamma(link="log"))
+    m4             <- stats::glm(beta.temp ~ Model.Matrix.4[,-1], family=Gamma(link="log"))
     Q.b.function   <- function(coef){
       q.b.res <- sum((alpha1.current + alpha2.current + alpha3.current) * log(exp(coef %*% t(Model.Matrix.4)))) -
         sum(exp(coef %*% t(Model.Matrix.4)) * (Expected.x1 + Expected.x2 + Expected.x3))
       return(q.b.res)
     }
-    coef4.optim    <- optim(par     = as.vector(m4$coefficients),
+    coef4.optim    <- stats::optim(par     = as.vector(m4$coefficients),
                             fn      = Q.b.function,
                             gr      = NULL,
                             hessian = TRUE,
@@ -244,14 +244,14 @@ BGR.EE <- function(y,
     coef4.new      <- coef4.optim$par
     beta.new       <- as.vector(exp(coef4.new%*%t(Model.Matrix.4)))
 
-    m1             <- glm(alpha1.current~Model.Matrix.1[,-1], family=Gamma(link="log"))
+    m1             <- stats::glm(alpha1.current~Model.Matrix.1[,-1], family=Gamma(link="log"))
     Q.function.a1  <- function(coef){
       q.res <- sum( exp(coef %*% t(Model.Matrix.1)) * log(beta.new) ) -
         sum( lgamma(exp(coef%*%t(Model.Matrix.1))) ) +
         sum( exp(coef %*% t(Model.Matrix.1)) * Expected.logx1 )
       return(q.res)
     }
-    coef1.optim    <- optim(par     = as.vector(m1$coefficients),
+    coef1.optim    <- stats::optim(par     = as.vector(m1$coefficients),
                             fn      = Q.function.a1,
                             gr      = NULL,
                             hessian = TRUE,
@@ -266,8 +266,8 @@ BGR.EE <- function(y,
         sum( exp(coef %*% t(Model.Matrix.2)) * Expected.logx2 )
       return(q.res)
     }
-    m2             <- glm(alpha2.current~Model.Matrix.2[,-1], family=Gamma(link="log"))
-    coef2.optim    <- optim(par     = as.vector(m2$coefficients),
+    m2             <- stats::glm(alpha2.current~Model.Matrix.2[,-1], family=Gamma(link="log"))
+    coef2.optim    <- stats::optim(par     = as.vector(m2$coefficients),
                             fn      = Q.function.a2,
                             gr      = NULL,
                             hessian = TRUE,
@@ -282,8 +282,8 @@ BGR.EE <- function(y,
         sum( exp(coef %*% t(Model.Matrix.3)) * Expected.logx3 )
       return(q.res)
     }
-    m3             <- glm(alpha3.current~Model.Matrix.3[,-1], family=Gamma(link="log"))
-    coef3.optim    <- optim(par     = as.vector(m3$coefficients),
+    m3             <- stats::glm(alpha3.current~Model.Matrix.3[,-1], family=Gamma(link="log"))
+    coef3.optim    <- stats::optim(par     = as.vector(m3$coefficients),
                             fn      = Q.function.a3,
                             gr      = NULL,
                             hessian = TRUE,
@@ -418,9 +418,9 @@ BGR.EI <- function(y,
   }
   x1.start       <- y1 - x3.start
   x2.start       <- y2 - x3.start
-  start.temp.glm.1 <- glm(x1.start~Model.Matrix.1[,-1], family=Gamma(link="log"))
-  start.temp.glm.2 <- glm(x2.start~Model.Matrix.2[,-1], family=Gamma(link="log"))
-  start.temp.glm.3 <- glm(x3.start~Model.Matrix.3[,-1], family=Gamma(link="log"))
+  start.temp.glm.1 <- stats::glm(x1.start~Model.Matrix.1[,-1], family=Gamma(link="log"))
+  start.temp.glm.2 <- stats::glm(x2.start~Model.Matrix.2[,-1], family=Gamma(link="log"))
+  start.temp.glm.3 <- stats::glm(x3.start~Model.Matrix.3[,-1], family=Gamma(link="log"))
   coef1.current  <- start.temp.glm.1$coefficient
   coef2.current  <- start.temp.glm.2$coefficient
   coef3.current  <- start.temp.glm.3$coefficient
@@ -488,8 +488,8 @@ BGR.EI <- function(y,
         sum( exp(coef%*%t(Model.Matrix)) * Expected.logs )
       return(q.res)
     }
-    m1             <- glm(alpha1.current~Model.Matrix.1[,-1], family=Gamma(link="log"))
-    coef1.new      <- optim(par          = as.vector(m1$coefficients),
+    m1             <- stats::glm(alpha1.current~Model.Matrix.1[,-1], family=Gamma(link="log"))
+    coef1.new      <- stats::optim(par          = as.vector(m1$coefficients),
                             fn           = Q.function,
                             Model.Matrix = Model.Matrix.1,
                             Expected.logs= Expected.logx1,
@@ -498,8 +498,8 @@ BGR.EI <- function(y,
                             control      = list(fnscale=-1))$par
     alpha1.new     <- as.vector(exp(coef1.new%*%t(Model.Matrix.1)))
 
-    m2             <- glm(alpha2.current~Model.Matrix.2[,-1], family=Gamma(link="log"))
-    coef2.new      <- optim(par          = as.vector(m2$coefficients),
+    m2             <- stats::glm(alpha2.current~Model.Matrix.2[,-1], family=Gamma(link="log"))
+    coef2.new      <- stats::optim(par          = as.vector(m2$coefficients),
                             fn           = Q.function,
                             Model.Matrix = Model.Matrix.2,
                             Expected.logs= Expected.logx2,
@@ -508,8 +508,8 @@ BGR.EI <- function(y,
                             control      = list(fnscale=-1))$par
     alpha2.new     <- as.vector(exp(coef2.new%*%t(Model.Matrix.2)))
 
-    m3             <- glm(alpha3.current~Model.Matrix.3[,-1], family=Gamma(link="log"))
-    coef3.new      <- optim(par          = as.vector(m3$coefficients),
+    m3             <- stats::glm(alpha3.current~Model.Matrix.3[,-1], family=Gamma(link="log"))
+    coef3.new      <- stats::optim(par          = as.vector(m3$coefficients),
                             fn           = Q.function,
                             Model.Matrix = Model.Matrix.3,
                             Expected.logs= Expected.logx3,
@@ -630,7 +630,7 @@ BGR.IE <- function(y,
   alpha2.current   <- MASS::fitdistr(x1.start, "gamma")$estimate[1]
   alpha3.current   <- MASS::fitdistr(x1.start, "gamma")$estimate[1]
   beta.current     <- rowMeans(cbind(alpha1.current/x1.start, alpha2.current/x2.start, alpha3.current/x3.start))
-  start.temp.glm   <- glm(beta.current~Model.Matrix.4[,-1], family=Gamma(link="log"))
+  start.temp.glm   <- stats::glm(beta.current~Model.Matrix.4[,-1], family=Gamma(link="log"))
   coef4.current    <- start.temp.glm$coefficient
   #--------------------------
 
@@ -685,8 +685,8 @@ BGR.IE <- function(y,
       return(q.b.res)
     }
     beta.temp      <- (alpha1.current+alpha2.current+alpha3.current) / (Expected.x1+Expected.x2+Expected.x3)
-    m4             <- glm(beta.temp~Model.Matrix.4[,-1], family=Gamma(link="log"))
-    coef4.new      <- optim(par     = as.vector(m4$coefficients),
+    m4             <- stats::glm(beta.temp~Model.Matrix.4[,-1], family=Gamma(link="log"))
+    coef4.new      <- stats::optim(par     = as.vector(m4$coefficients),
                             fn      = Q.b.function,
                             gr      = NULL,
                             hessian = TRUE,
@@ -696,7 +696,7 @@ BGR.IE <- function(y,
     alpha1.rootfun <- function(alpha1.var){
       sum(log(beta.new)) - digamma(alpha1.var)*n + sum(Expected.logx1)
     }
-    alpha1.new <- uniroot(alpha1.rootfun,
+    alpha1.new <- stats::uniroot(alpha1.rootfun,
                           lower=sqrt(.Machine$double.eps),
                           upper=100000,
                           tol = sqrt(.Machine$double.xmin),
@@ -705,7 +705,7 @@ BGR.IE <- function(y,
     alpha2.rootfun <- function(alpha2.var){
       sum(log(beta.new)) - digamma(alpha2.var)*n + sum(Expected.logx2)
     }
-    alpha2.new <- uniroot(alpha2.rootfun,
+    alpha2.new <- stats::uniroot(alpha2.rootfun,
                           lower=sqrt(.Machine$double.eps),
                           upper=100000,
                           tol = sqrt(.Machine$double.xmin),
@@ -713,7 +713,7 @@ BGR.IE <- function(y,
     alpha3.rootfun <- function(alpha3.var){
       sum(log(beta.new)) - digamma(alpha3.var)*n + sum(Expected.logx3)
     }
-    alpha3.new <- uniroot(alpha3.rootfun,
+    alpha3.new <- stats::uniroot(alpha3.rootfun,
                           lower=sqrt(.Machine$double.eps),
                           upper=100000,
                           tol = sqrt(.Machine$double.xmin),

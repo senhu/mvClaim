@@ -41,7 +41,7 @@ MBGR.CV <- function(y,
     else {gating.new <- formula(paste("pzy", as.character(gating)[2], sep="~"))}
   }
 
-  Model.Matrix.4 <- as.matrix(Matrix::sparse.model.matrix(f4.new[-2], data=newdata))
+  Model.Matrix.4 <- as.matrix(stats::model.matrix(f4.new[-2], data=newdata))
 
   #-----------------------------
   # starting values
@@ -75,7 +75,7 @@ MBGR.CV <- function(y,
       alpha2.current[gg]  <- MASS::fitdistr(x2[index==gg], "gamma")$estimate[1]
       alpha3.current[gg]  <- MASS::fitdistr(x3[index==gg], "gamma")$estimate[1]
       be.temp             <- (alpha1.current[gg]+alpha2.current[gg]+alpha3.current[gg]) / (x1+x2+x3)
-      start.temp.glm.4    <- glm(be.temp~Model.Matrix.4[,-1], family=Gamma(link="log"))
+      start.temp.glm.4    <- stats::glm(be.temp~Model.Matrix.4[,-1], family=Gamma(link="log"))
       beta.current[,gg]   <- start.temp.glm.4$fitted.values
       coef4.current       <- cbind(coef4.current, as.vector(start.temp.glm.4$coefficients))
     }
@@ -160,8 +160,8 @@ MBGR.CV <- function(y,
       return(q.b.res)
     }
     for (g in c(1:G)){
-      m4             <- glm(beta.current[,g] ~ Model.Matrix.4[,-1], family=Gamma(link="log")  )
-      coef4.optim    <- optim(par     = as.vector(m4$coefficients),
+      m4             <- stats::glm(beta.current[,g] ~ Model.Matrix.4[,-1], family=Gamma(link="log")  )
+      coef4.optim    <- stats::optim(par     = as.vector(m4$coefficients),
                               fn      = Q.function,
                               wh      = g,
                               gr      = NULL,
@@ -175,7 +175,7 @@ MBGR.CV <- function(y,
       alpha1.rootfun <- function(alpha1.var, wh){
         z.new[,wh]%*%log(beta.new[,wh]) - digamma(alpha1.var)*sum(z.new[,wh]) + z.new[,wh]%*%Expected.logx1[,wh]
       }
-      alpha1.new[g]  <- uniroot(f    = alpha1.rootfun,
+      alpha1.new[g]  <- stats::uniroot(f    = alpha1.rootfun,
                                 wh   = g,
                                 lower= sqrt(.Machine$double.eps),
                                 upper= 100000,
@@ -183,7 +183,7 @@ MBGR.CV <- function(y,
       alpha2.rootfun <- function(alpha2.var, wh){
         z.new[,wh]%*%log(beta.new[,wh]) - digamma(alpha2.var)*sum(z.new[,wh]) + z.new[,wh]%*%Expected.logx2[,wh]
       }
-      alpha2.new[g]  <- uniroot(f    = alpha2.rootfun,
+      alpha2.new[g]  <- stats::uniroot(f    = alpha2.rootfun,
                                 wh   = g,
                                 lower= sqrt(.Machine$double.eps),
                                 upper= 100000,
@@ -191,7 +191,7 @@ MBGR.CV <- function(y,
       alpha3.rootfun <- function(alpha3.var, wh){
         z.new[,wh]%*%log(beta.new[,wh]) - digamma(alpha3.var)*sum(z.new[,wh]) + z.new[,wh]%*%Expected.logx3[,wh]
       }
-      alpha3.new[g]  <- uniroot(f    = alpha3.rootfun,
+      alpha3.new[g]  <- stats::uniroot(f    = alpha3.rootfun,
                                 wh   = g,
                                 lower= sqrt(.Machine$double.eps),
                                 upper= 100000,

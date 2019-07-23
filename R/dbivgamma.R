@@ -35,14 +35,14 @@ dbivgamma <- function(y, alpha, beta, log=FALSE){
   alpha3 <- alpha[3]
   beta <- beta
   integrand <- function(x3){
-    dgamma(y1-x3,shape=alpha1,rate=beta, log=FALSE)*
-      dgamma(y2-x3,shape=alpha2,rate=beta, log=FALSE)*
-      dgamma(x3,shape=alpha3,rate=beta, log=FALSE)
+    stats::dgamma(y1-x3,shape=alpha1,rate=beta, log=FALSE)*
+      stats::dgamma(y2-x3,shape=alpha2,rate=beta, log=FALSE)*
+      stats::dgamma(x3,shape=alpha3,rate=beta, log=FALSE)
   }
   log.integrand <- function(x3){
-    dgamma(y1-x3,shape=alpha1,rate=beta, log=TRUE)+
-      dgamma(y2-x3,shape=alpha2,rate=beta, log=TRUE)+
-      dgamma(x3,shape=alpha3,rate=beta, log=TRUE)
+    stats::dgamma(y1-x3,shape=alpha1,rate=beta, log=TRUE)+
+      stats::dgamma(y2-x3,shape=alpha2,rate=beta, log=TRUE)+
+      stats::dgamma(x3,shape=alpha3,rate=beta, log=TRUE)
   }
   int <- distrEx::distrExIntegrate(integrand, lower=0, upper=min(y1,y2),
                                    rel.tol = 1e-6, order=1e+3)

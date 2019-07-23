@@ -54,15 +54,15 @@ MBGR.EC <- function(y,
     else {gating.new <- formula(paste("pzy", as.character(gating)[2], sep="~"))}
   }
 
-  Model.Matrix.1 <- as.matrix(Matrix::sparse.model.matrix(f1.new[-2], data=newdata))
-  Model.Matrix.2 <- as.matrix(Matrix::sparse.model.matrix(f2.new[-2], data=newdata))
-  Model.Matrix.3 <- as.matrix(Matrix::sparse.model.matrix(f3.new[-2], data=newdata))
+  Model.Matrix.1 <- as.matrix(stats::model.matrix(f1.new[-2], data=newdata))
+  Model.Matrix.2 <- as.matrix(stats::model.matrix(f2.new[-2], data=newdata))
+  Model.Matrix.3 <- as.matrix(stats::model.matrix(f3.new[-2], data=newdata))
 
   #-----------------------------
   # starting values
 
   if (initialization == "mclust"){
-    initial.mclust <- mclust::Mclust(G=G, data = cbind(y1,y2),, verbose = FALSE)
+    initial.mclust <- mclust::Mclust(G=G, data = cbind(y1,y2), verbose = FALSE)
     z.init         <- initial.mclust$z
 
     if (gating == "C"){
@@ -93,9 +93,9 @@ MBGR.EC <- function(y,
       data.start$x1       <- x1[index==gg]
       data.start$x2       <- x2[index==gg]
       data.start$x3       <- x3[index==gg]
-      start.temp.glm.1    <- glm(x1 ~ Model.Matrix.1[index==gg,-1], data=data.start, family=Gamma(link="log"))
-      start.temp.glm.2    <- glm(x2 ~ Model.Matrix.2[index==gg,-1], data=data.start, family=Gamma(link="log"))
-      start.temp.glm.3    <- glm(x3 ~ Model.Matrix.3[index==gg,-1], data=data.start, family=Gamma(link="log"))
+      start.temp.glm.1    <- stats::glm(x1 ~ Model.Matrix.1[index==gg,-1], data=data.start, family=Gamma(link="log"))
+      start.temp.glm.2    <- stats::glm(x2 ~ Model.Matrix.2[index==gg,-1], data=data.start, family=Gamma(link="log"))
+      start.temp.glm.3    <- stats::glm(x3 ~ Model.Matrix.3[index==gg,-1], data=data.start, family=Gamma(link="log"))
 
       if (any(is.na(start.temp.glm.1$coefficient)==TRUE)){
         start.temp.glm.1.coef <- replace(as.vector(start.temp.glm.1$coefficient), which(is.na(start.temp.glm.1$coefficient)), 0)
@@ -192,8 +192,8 @@ MBGR.EC <- function(y,
                 sum( rowSums(z.mat * Expected.log.value) * exp(coef%*%t(Model.Matrix)) )
       return(q.res)
     }
-    m1             <- glm(alpha1.current ~ Model.Matrix.1[,-1], family=Gamma(link="log"))
-    coef1.optim    <- optim(par               = as.vector(m1$coefficients),
+    m1             <- stats::glm(alpha1.current ~ Model.Matrix.1[,-1], family=Gamma(link="log"))
+    coef1.optim    <- stats::optim(par               = as.vector(m1$coefficients),
                             fn                = Q.function,
                             Model.Matrix      = Model.Matrix.1,
                             Expected.log.value= Expected.logx1,
@@ -206,9 +206,9 @@ MBGR.EC <- function(y,
     alpha1.new     <- as.vector(exp(coef1.new%*%t(Model.Matrix.1)))
     hessian1       <- coef1.optim$hessian
 
-    m2             <- glm(alpha2.current ~ Model.Matrix.2[,-1], family=Gamma(link="log") )#, weights=z.new[,g]
+    m2             <- stats::glm(alpha2.current ~ Model.Matrix.2[,-1], family=Gamma(link="log") )#, weights=z.new[,g]
     coef2.new.temp <- as.vector(m2$coefficients)
-    coef2.optim    <- optim(par               = coef2.new.temp,
+    coef2.optim    <- stats::optim(par               = coef2.new.temp,
                             fn                = Q.function,
                             Model.Matrix      = Model.Matrix.2,
                             Expected.log.value= Expected.logx2,
@@ -221,9 +221,9 @@ MBGR.EC <- function(y,
     alpha2.new     <- as.vector(exp(coef2.new%*%t(Model.Matrix.2)))
     hessian2       <- coef2.optim$hessian
 
-    m3             <- glm(alpha3.current ~ Model.Matrix.3[,-1], family=Gamma(link="log") )#, weights=z.new[,g])
+    m3             <- stats::glm(alpha3.current ~ Model.Matrix.3[,-1], family=Gamma(link="log") )#, weights=z.new[,g])
     coef3.new.temp <- as.vector(m3$coefficients)
-    coef3.optim    <- optim(par               = coef3.new.temp,
+    coef3.optim    <- stats::optim(par               = coef3.new.temp,
                             fn                = Q.function,
                             Model.Matrix      = Model.Matrix.3,
                             Expected.log.value= Expected.logx3,

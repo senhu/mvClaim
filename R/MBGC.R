@@ -246,21 +246,21 @@ MBGC.CC <- function(y,
       alpha1.rootfun <- function(alpha1.var,wh){
         log(beta.new[wh])*sum(z.new[,wh]) - digamma(alpha1.var)*sum(z.new[,wh]) + z.new[,wh]%*%Expected.logx1[,g]
       }
-      alpha1.new[g] <- uniroot(alpha1.rootfun,wh=g,
+      alpha1.new[g] <- stats::uniroot(alpha1.rootfun,wh=g,
                                lower=.Machine$double.eps, #sqrt(.Machine$double.eps),
                                upper=100000,
                                tol = sqrt(.Machine$double.xmin))$root
       alpha2.rootfun <- function(alpha2.var,wh){
         log(beta.new[wh])*sum(z.new[,wh]) - digamma(alpha2.var)*sum(z.new[,wh]) + z.new[,wh]%*%Expected.logx2[,g]
       }
-      alpha2.new[g] <- uniroot(alpha2.rootfun,wh=g,
+      alpha2.new[g] <- stats::uniroot(alpha2.rootfun,wh=g,
                                lower=.Machine$double.eps,
                                upper=100000,
                                tol = sqrt(.Machine$double.xmin))$root
       alpha3.rootfun <- function(alpha3.var,wh){
         log(beta.new[wh])*sum(z.new[,wh]) - digamma(alpha3.var)*sum(z.new[,wh]) + z.new[,wh]%*%Expected.logx3[,g]
       }
-      alpha3.new[g] <- uniroot(alpha3.rootfun,wh=g,
+      alpha3.new[g] <- stats::uniroot(alpha3.rootfun,wh=g,
                                lower=.Machine$double.eps,
                                upper=100000,
                                tol=sqrt(.Machine$double.xmin))$root
@@ -524,21 +524,21 @@ MBGC.CI <- function(y,
       alpha1.rootfun <- function(alpha1.var,wh){
         log(beta.new)*sum(z.new[,wh]) - digamma(alpha1.var)*sum(z.new[,wh]) + z.new[,wh]%*%Expected.logx1[,wh]
       }
-      alpha1.new[g] <- uniroot(alpha1.rootfun,wh=g,
+      alpha1.new[g] <- stats::uniroot(alpha1.rootfun,wh=g,
                                lower=.Machine$double.eps,
                                upper=100000,
                                tol = sqrt(.Machine$double.xmin))$root
       alpha2.rootfun <- function(alpha2.var,wh){
         log(beta.new)*sum(z.new[,wh]) - digamma(alpha2.var)*sum(z.new[,wh]) + z.new[,wh]%*%Expected.logx2[,wh]
       }
-      alpha2.new[g] <- uniroot(alpha2.rootfun,wh=g,
+      alpha2.new[g] <- stats::uniroot(alpha2.rootfun,wh=g,
                                lower=.Machine$double.eps,
                                upper=100000,
                                tol = sqrt(.Machine$double.xmin))$root
       alpha3.rootfun <- function(alpha3.var,wh){
         log(beta.new)*sum(z.new[,wh]) - digamma(alpha3.var)*sum(z.new[,wh]) + z.new[,wh]%*%Expected.logx3[,wh]
       }
-      alpha3.new[g] <- uniroot(alpha3.rootfun,wh=g,
+      alpha3.new[g] <- stats::uniroot(alpha3.rootfun,wh=g,
                                lower=.Machine$double.eps,
                                upper=100000,
                                tol=sqrt(.Machine$double.xmin))$root
@@ -797,21 +797,21 @@ MBGC.IC <- function(y,
     alpha1.rootfun <- function(alpha1.var){
       sum(log(beta.new)*colSums(z.new)) - digamma(alpha1.var)*sum(z.new) + sum(z.new*Expected.logx1)
     }
-    alpha1.new <- uniroot(alpha1.rootfun,
+    alpha1.new <- stats::uniroot(alpha1.rootfun,
                           lower=.Machine$double.eps,
                           upper=100000,
                           tol = sqrt(.Machine$double.xmin))$root
     alpha2.rootfun <- function(alpha2.var){
       sum(log(beta.new)*colSums(z.new)) - digamma(alpha2.var)*sum(z.new) + sum(z.new*Expected.logx2)
     }
-    alpha2.new <- uniroot(alpha2.rootfun,
+    alpha2.new <- stats::uniroot(alpha2.rootfun,
                           lower=.Machine$double.eps,
                           upper=100000,
                           tol = sqrt(.Machine$double.xmin))$root
     alpha3.rootfun <- function(alpha3.var){
       sum(log(beta.new)*colSums(z.new)) - digamma(alpha3.var)*sum(z.new) + sum(z.new*Expected.logx3)
     }
-    alpha3.new <- uniroot(alpha3.rootfun,
+    alpha3.new <- stats::uniroot(alpha3.rootfun,
                           lower=.Machine$double.eps,
                           upper=100000,
                           tol=sqrt(.Machine$double.xmin))$root

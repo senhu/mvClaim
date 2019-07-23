@@ -41,7 +41,7 @@ MBGR.IV <- function(y,
     else {gating.new <- formula(paste("pzy", as.character(gating)[2], sep="~"))}
   }
 
-  Model.Matrix.4 <- as.matrix(Matrix::sparse.model.matrix(f4.new[-2], data=newdata))
+  Model.Matrix.4 <- as.matrix(stats::model.matrix(f4.new[-2], data=newdata))
   #-----------------------------
   # starting values
 
@@ -74,7 +74,7 @@ MBGR.IV <- function(y,
       alpha2.current.temp[gg] <- MASS::fitdistr(x2[index==gg], "gamma")$estimate[1]
       alpha3.current.temp[gg] <- MASS::fitdistr(x3[index==gg], "gamma")$estimate[1]
       be.temp             <- (alpha1.current.temp[gg]+alpha2.current.temp[gg]+alpha3.current.temp[gg]) / (x1+x2+x3)
-      start.temp.glm.4    <- glm(be.temp~Model.Matrix.4[,-1], family=Gamma(link="log"))
+      start.temp.glm.4    <- stats::glm(be.temp~Model.Matrix.4[,-1], family=Gamma(link="log"))
       beta.current[,gg]   <- start.temp.glm.4$fitted.values
       coef4.current       <- cbind(coef4.current, as.vector(start.temp.glm.4$coefficients))
     }
@@ -158,8 +158,8 @@ MBGR.IV <- function(y,
       return(q.b.res)
     }
     for (g in c(1:G)){
-      m4             <- glm(beta.current[,g] ~ Model.Matrix.4[,-1], family=Gamma(link="log"))
-      coef4.optim    <- optim(par     = as.vector(m4$coefficients),
+      m4             <- stats::glm(beta.current[,g] ~ Model.Matrix.4[,-1], family=Gamma(link="log"))
+      coef4.optim    <- stats::optim(par     = as.vector(m4$coefficients),
                               fn      = Q.function,
                               wh      = g,
                               gr      = NULL,
@@ -173,21 +173,21 @@ MBGR.IV <- function(y,
     alpha1.rootfun <- function(alpha1.var){
       sum(z.new*log(beta.new)) - digamma(alpha1.var)*sum(z.new) + sum(z.new*Expected.logx1)
     }
-    alpha1.new  <- uniroot(f     = alpha1.rootfun,
+    alpha1.new  <- stats::uniroot(f     = alpha1.rootfun,
                            lower = .Machine$double.eps, # sqrt(.Machine$double.eps)
                            upper = 100000,
                            tol   = sqrt(.Machine$double.xmin))$root
     alpha2.rootfun <- function(alpha2.var){
       sum(z.new*log(beta.new)) - digamma(alpha2.var)*sum(z.new) + sum(z.new*Expected.logx2)
     }
-    alpha2.new <- uniroot(f    = alpha2.rootfun,
+    alpha2.new <- stats::uniroot(f    = alpha2.rootfun,
                           lower= .Machine$double.eps,
                           upper= 100000,
                           tol  = sqrt(.Machine$double.xmin))$root
     alpha3.rootfun <- function(alpha3.var){
       sum(z.new*log(beta.new)) - digamma(alpha3.var)*sum(z.new) + sum(z.new*Expected.logx3)
     }
-    alpha3.new <- uniroot(f    = alpha3.rootfun,
+    alpha3.new <- stats::uniroot(f    = alpha3.rootfun,
                           lower= .Machine$double.eps,
                           upper= 100000,
                           tol  = sqrt(.Machine$double.xmin))$root

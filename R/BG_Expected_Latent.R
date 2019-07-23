@@ -7,22 +7,22 @@ expected.latent <- function(y, alpha, beta){
   beta <- beta
 
   integrand.numerator.logs <- function(x3){
-    log(x3) * dgamma(y1-x3,shape=alpha1,rate=beta, log=FALSE)*
-      dgamma(y2-x3,shape=alpha2,rate=beta, log=FALSE)*
-      dgamma(x3,shape=alpha3,rate=beta, log=FALSE)
+    log(x3) * stats::dgamma(y1-x3,shape=alpha1,rate=beta, log=FALSE)*
+      stats::dgamma(y2-x3,shape=alpha2,rate=beta, log=FALSE)*
+      stats::dgamma(x3,shape=alpha3,rate=beta, log=FALSE)
   }
 
 
   integrand.numerator.logy1s <- function(x3){
-    log(y1-x3) * dgamma(y1-x3,shape=alpha1,rate=beta, log=FALSE)*
-      dgamma(y2-x3,shape=alpha2,rate=beta, log=FALSE)*
-      dgamma(x3,shape=alpha3,rate=beta, log=FALSE)
+    log(y1-x3) * stats::dgamma(y1-x3,shape=alpha1,rate=beta, log=FALSE)*
+      stats::dgamma(y2-x3,shape=alpha2,rate=beta, log=FALSE)*
+      stats::dgamma(x3,shape=alpha3,rate=beta, log=FALSE)
   }
 
   integrand.numerator.logy2s <- function(x3){
-    log(y2-x3) * dgamma(y1-x3,shape=alpha1,rate=beta, log=FALSE)*
-      dgamma(y2-x3,shape=alpha2,rate=beta, log=FALSE)*
-      dgamma(x3,shape=alpha3,rate=beta, log=FALSE)
+    log(y2-x3) * stats::dgamma(y1-x3,shape=alpha1,rate=beta, log=FALSE)*
+      stats::dgamma(y2-x3,shape=alpha2,rate=beta, log=FALSE)*
+      stats::dgamma(x3,shape=alpha3,rate=beta, log=FALSE)
   }
 
   #-------------------------

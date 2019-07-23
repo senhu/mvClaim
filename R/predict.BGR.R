@@ -58,13 +58,13 @@ predict.BGR <- function(object, newdata, ...){
 predict.BGR.EE <- function(object, newdata, ...){
 
   l1.n    <- object$formula[[1]]
-  matrix1 <- as.matrix(Matrix::sparse.model.matrix(l1.n, data=newdata))
+  matrix1 <- as.matrix(stats::model.matrix(l1.n, data=newdata))
   l2.n    <- object$formula[[2]]
-  matrix2 <- as.matrix(Matrix::sparse.model.matrix(l2.n, data=newdata))
+  matrix2 <- as.matrix(stats::model.matrix(l2.n, data=newdata))
   l3.n    <- object$formula[[3]]
-  matrix3 <- as.matrix(Matrix::sparse.model.matrix(l3.n, data=newdata))
+  matrix3 <- as.matrix(stats::model.matrix(l3.n, data=newdata))
   l4.n    <- object$formula[[4]]
-  matrix4 <- as.matrix(Matrix::sparse.model.matrix(l4.n, data=newdata))
+  matrix4 <- as.matrix(stats::model.matrix(l4.n, data=newdata))
 
   a1 <- exp(matrix1 %*% object$coefficients[[1]])
   a2 <- exp(matrix2 %*% object$coefficients[[2]])
@@ -86,11 +86,11 @@ predict.BGR.EE <- function(object, newdata, ...){
 predict.BGR.EI <- function(object, newdata, ...){
 
   l1.n    <- object$formula[[1]]
-  matrix1 <- as.matrix(Matrix::sparse.model.matrix(l1.n, data=newdata))
+  matrix1 <- as.matrix(stats::model.matrix(l1.n, data=newdata))
   l2.n    <- object$formula[[2]]
-  matrix2 <- as.matrix(Matrix::sparse.model.matrix(l2.n, data=newdata))
+  matrix2 <- as.matrix(stats::model.matrix(l2.n, data=newdata))
   l3.n    <- object$formula[[3]]
-  matrix3 <- as.matrix(Matrix::sparse.model.matrix(l3.n, data=newdata))
+  matrix3 <- as.matrix(stats::model.matrix(l3.n, data=newdata))
 
   a1 <- exp(matrix1 %*% object$coefficients[[1]])
   a2 <- exp(matrix2 %*% object$coefficients[[2]])
@@ -111,7 +111,7 @@ predict.BGR.EI <- function(object, newdata, ...){
 
 predict.BGR.IE <- function(object, newdata, ...){
   l4.n    <- object$formula
-  matrix4 <- as.matrix(Matrix::sparse.model.matrix(l4.n, data=newdata))
+  matrix4 <- as.matrix(stats::model.matrix(l4.n, data=newdata))
   a1 <- object$alpha1
   a2 <- object$alpha2
   a3 <- object$alpha3
