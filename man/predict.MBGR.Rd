@@ -2,9 +2,36 @@
 % Please edit documentation in R/predict.MBGR.R
 \name{predict.MBGR}
 \alias{predict.MBGR}
+\alias{predict_MBGR_VC}
+\alias{predict_MBGR_CV}
+\alias{predict_MBGR_VV}
+\alias{predict_MBGR_VI}
+\alias{predict_MBGR_IV}
+\alias{predict_MBGR_VE}
+\alias{predict_MBGR_EV}
+\alias{predict_MBGR_EC}
+\alias{predict_MBGR_CE}
 \title{Predict Method for Bivariate Gamma Regressions}
 \usage{
 \method{predict}{MBGR}(object, newdata, ...)
+
+predict_MBGR_VC(object, newdata)
+
+predict_MBGR_CV(object, newdata)
+
+predict_MBGR_VV(object, newdata)
+
+predict_MBGR_VI(object, newdata)
+
+predict_MBGR_IV(object, newdata)
+
+predict_MBGR_VE(object, newdata)
+
+predict_MBGR_EV(object, newdata)
+
+predict_MBGR_EC(object, newdata)
+
+predict_MBGR_CE(object, newdata)
 }
 \arguments{
 \item{object}{a fitted model object of class \code{"BGR"} or \code{"MBGR"}}
@@ -26,7 +53,6 @@ a list with components (depends on model class):
 Obtains predictions from the fitted bivariate gamma regression models.
 }
 \examples{
-
 \donttest{
 m1 <- MBGR(modelName = "VC", G=2,
            y=c("y1","y2"), data = fullsim,

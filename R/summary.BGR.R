@@ -21,8 +21,8 @@
 #' summary(mod)
 #' }
 #'
+#' @export summary.BGR
 #' @export
-
 
 summary.BGR <- function(object, ...){
   title <- paste("Bivariate gamma regression (BGR) fitted by EM algorithm")
@@ -40,6 +40,7 @@ summary.BGR <- function(object, ...){
 }
 
 #' @rdname summary.BGR
+#' @export print.summary.BGR
 #' @export
 
 print.summary.BGR <- function(x, digits = getOption("digits"), ...)

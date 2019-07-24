@@ -204,8 +204,4 @@ BGE.data.loglikelihood <- function(data, alpha, beta){
 }
 
 #' @export
-
 print.BGE <- function (x, ...){ print(x$estimate) }
-
-
-

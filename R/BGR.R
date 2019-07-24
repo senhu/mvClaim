@@ -35,7 +35,6 @@
 #'   \item{trace}{All estimated coefficients and alpha, beta values in the EM algorithm.}
 #'
 #' @examples
-#'
 #' \donttest{
 #' mod1 <- BGR(modelName = "EE",
 #'             y = c("y1","y2"), data = fullsim,
@@ -104,8 +103,8 @@ BGR <- function(modelName = c("EE","EI","IE"),
          )
 }
 
-# #' @rdname BGR
-
+#' @rdname BGR
+#' @export
 BGR_EE <- function(y,
                    data,
                    f1,
@@ -367,8 +366,8 @@ BGR_EE <- function(y,
   structure(result, class = c('BGR'))
 }
 
-# #' @rdname BGR
-
+#' @rdname BGR
+#' @export
 BGR_EI <- function(y,
                    data,
                    f1,
@@ -589,8 +588,8 @@ BGR_EI <- function(y,
   structure(result, class = c('BGR'))
 }
 
-# #' @rdname BGR
-
+#' @rdname BGR
+#' @export
 BGR_IE <- function(y,
                    data,
                    f4,
@@ -779,7 +778,6 @@ BGR_IE <- function(y,
 }
 
 #' @export
-
 print.BGR <- function (x, ...){
   txt <- paste0("'", class(x)[1], "' model of type '", x$modelName, "'")
   cat(txt, "\n")

@@ -21,7 +21,6 @@
 #'   \item{what=="uncertainty"}{a plot of classification uncertainty.}
 #'
 #' @examples
-#'
 #' \donttest{
 #' m1 <- MBGR(modelName = "CE", y=c("y1","y2"),
 #'            data   = fullsim, G=2,
@@ -42,6 +41,7 @@
 #' }
 #'
 #' @importFrom graphics points plot
+#' @export plot.MBGR
 #' @export
 
 plot.MBGR <- function(x, what="classification",
@@ -87,6 +87,7 @@ plot.MBGR <- function(x, what="classification",
 }
 
 #' @rdname plot.MBGR
+#' @export plot.BGR
 #' @export
 
 plot.BGR <- function(x,
@@ -111,6 +112,7 @@ plot.BGR <- function(x,
 
 
 #' @rdname plot.MBGR
+#' @export plot.MBGC
 #' @export
 
 plot.MBGC <- function(x, what="classification",

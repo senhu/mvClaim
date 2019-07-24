@@ -15,7 +15,6 @@
 #'   \item{tau.fit}{predicted mixing proportion values, if covariates enter the gating network.}
 #'
 #' @examples
-#'
 #' \donttest{
 #' m1 <- MBGR(modelName = "VC", G=2,
 #'            y=c("y1","y2"), data = fullsim,
@@ -28,6 +27,7 @@
 #' }
 #'
 #' @importFrom stats model.matrix
+#' @export predict.MBGR
 #' @export
 
 predict.MBGR <- function(object, newdata, ...){
@@ -64,6 +64,9 @@ predict.MBGR <- function(object, newdata, ...){
 }
 
 # MBGR2
+#' @rdname predict.MBGR
+#' @export predict_MBGR_VC
+#' @export
 predict_MBGR_VC <- function(object, newdata){
   l1.n    <- object$formula[[1]]
   matrix1 <- as.matrix(stats::model.matrix(l1.n, data=newdata))
@@ -99,7 +102,11 @@ predict_MBGR_VC <- function(object, newdata){
                  tau.fit    = pz)
   return(result)
 }
+
 # MBGR3
+#' @rdname predict.MBGR
+#' @export predict_MBGR_CV
+#' @export
 predict_MBGR_CV <- function(object, newdata){
   l4.n    <- object$formula[[1]]
   matrix4 <- as.matrix(stats::model.matrix(l4.n, data=newdata))
@@ -131,7 +138,11 @@ predict_MBGR_CV <- function(object, newdata){
                  tau.fit    = pz)
   return(result)
 }
+
 # MBGR4
+#' @rdname predict.MBGR
+#' @export predict_MBGR_VV
+#' @export
 predict_MBGR_VV <- function(object, newdata){
   l1.n    <- object$formula[[1]]
   matrix1 <- as.matrix(stats::model.matrix(l1.n, data=newdata))
@@ -169,7 +180,11 @@ predict_MBGR_VV <- function(object, newdata){
                  tau.fit    = pz)
   return(result)
 }
+
 # MBGR5
+#' @rdname predict.MBGR
+#' @export predict_MBGR_VI
+#' @export
 predict_MBGR_VI <- function(object, newdata){
   l1.n    <- object$formula[[1]]
   matrix1 <- as.matrix(stats::model.matrix(l1.n, data=newdata))
@@ -206,7 +221,11 @@ predict_MBGR_VI <- function(object, newdata){
                  tau.fit    = pz)
   return(result)
 }
+
 # MBGR6
+#' @rdname predict.MBGR
+#' @export predict_MBGR_IV
+#' @export
 predict_MBGR_IV <- function(object, newdata){
   l4.n    <- object$formula[[1]]
   matrix4 <- as.matrix(stats::model.matrix(l4.n, data=newdata))
@@ -239,7 +258,11 @@ predict_MBGR_IV <- function(object, newdata){
                  tau.fit    = pz)
   return(result)
 }
+
 # MBGR7
+#' @rdname predict.MBGR
+#' @export predict_MBGR_VE
+#' @export
 predict_MBGR_VE <- function(object, newdata){
   l1.n    <- object$formula[[1]]
   matrix1 <- as.matrix(stats::model.matrix(l1.n, data=newdata))
@@ -278,7 +301,11 @@ predict_MBGR_VE <- function(object, newdata){
                  tau.fit    = pz)
   return(result)
 }
+
 # MBGR8
+#' @rdname predict.MBGR
+#' @export predict_MBGR_EV
+#' @export
 predict_MBGR_EV <- function(object, newdata){
   l1.n    <- object$formula[[1]]
   matrix1 <- as.matrix(stats::model.matrix(l1.n, data=newdata))
@@ -317,7 +344,11 @@ predict_MBGR_EV <- function(object, newdata){
                  tau.fit    = pz)
   return(result)
 }
+
 # MBGR9
+#' @rdname predict.MBGR
+#' @export predict_MBGR_EC
+#' @export
 predict_MBGR_EC <- function(object, newdata){
   l1.n    <- object$formula[[1]]
   matrix1 <- as.matrix(stats::model.matrix(l1.n, data=newdata))
@@ -354,7 +385,11 @@ predict_MBGR_EC <- function(object, newdata){
                  tau.fit    = pz)
   return(result)
 }
+
 #MBGR10
+#' @rdname predict.MBGR
+#' @export predict_MBGR_CE
+#' @export
 predict_MBGR_CE <- function(object, newdata){
   l4.n    <- object$formula[[1]]
   matrix4 <- as.matrix(stats::model.matrix(l4.n, data=newdata))

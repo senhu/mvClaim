@@ -2,10 +2,20 @@
 % Please edit documentation in R/BGR.R
 \name{BGR}
 \alias{BGR}
+\alias{BGR_EE}
+\alias{BGR_EI}
+\alias{BGR_IE}
 \title{Bivariate Gamma Regression}
 \usage{
 BGR(modelName = c("EE", "EI", "IE"), y, data, f1, f2, f3, f4,
   maxit = 100, tol = 1e-05, verbose = TRUE)
+
+BGR_EE(y, data, f1, f2, f3, f4, maxit = 100, tol = 1e-05,
+  verbose = TRUE)
+
+BGR_EI(y, data, f1, f2, f3, maxit = 100, tol = 1e-05, verbose = TRUE)
+
+BGR_IE(y, data, f4, maxit = 100, tol = 1e-05, verbose = TRUE)
 }
 \arguments{
 \item{modelName}{A character string indicating which model to be fitted. Need to be one of "EE", "EI", "IE".}
@@ -54,7 +64,6 @@ An object of class \code{BGR} providing the estimation results.
 Bivariate gamma regression models for three model types: EE, EI, IE. Models are estimated by EM algorithm.
 }
 \examples{
-
 \donttest{
 mod1 <- BGR(modelName = "EE",
             y = c("y1","y2"), data = fullsim,

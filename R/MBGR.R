@@ -45,7 +45,7 @@
 #'
 #' @examples
 #'
-#' \donttest{
+#' \dontrun{
 #' m1 <- MBGR(modelName = "VV",
 #'            y=c("y1","y2"), data = fullsim, G=2,
 #'            f1     = ~ w1 + w2,
@@ -56,6 +56,7 @@
 #' }
 #'
 #' @importFrom stats glm optim uniroot model.matrix Gamma formula runif coef optimHess
+#' @importFrom mclust Mclust
 #' @export
 
 MBGR <- function(modelName = c("VC","VI","VV","VE", "CV", "IV", "EV", "EC", "CE"),
@@ -155,7 +156,6 @@ MBGR <- function(modelName = c("VC","VI","VV","VE", "CV", "IV", "EV", "EC", "CE"
 }
 
 #' @export
-
 print.MBGR <- function (x, ...){
   modelfullname <- paste0(x$gating, x$modelName, collapse="")
   txt <- paste0("'", class(x)[1], "' model of type '", modelfullname, "' with G = ", x$G)

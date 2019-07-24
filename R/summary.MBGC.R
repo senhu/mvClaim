@@ -8,7 +8,6 @@
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @examples
-#'
 #' \donttest{
 #' clust1 <- MBGC(modelName = "CC", y=c("y1","y2"),
 #'                G=2, gating = "C", data=gatingsim)
@@ -21,6 +20,7 @@
 #' summary(clust4)
 #' }
 #'
+#' @export summary.MBGC
 #' @export
 
 summary.MBGC <- function(object, ...){
@@ -43,6 +43,7 @@ summary.MBGC <- function(object, ...){
 }
 
 #' @rdname summary.MBGC
+#' @export print.summary.MBGC
 #' @export
 
 print.summary.MBGC <- function(x, digits = getOption("digits"), ...)

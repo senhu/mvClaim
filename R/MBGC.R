@@ -39,9 +39,10 @@
 #'   \item{call}{The matched call.}
 #'   \item{trace}{All estimated coefficients and alpha, beta values in the EM algorithm.}
 #'
-#' @examples
+#' @importFrom mclust Mclust
 #'
-#' \donttest{
+#' @examples
+#' \dontrun{
 #' clust1 <- MBGC(modelName = "CC", y=c("y1","y2"),
 #'                G=2, gating = "C", data=gatingsim, verbose=FALSE)
 #' clust1
@@ -106,8 +107,8 @@ print.MBGC <- function (x, ...){
   invisible(x)
 }
 
-# #' @rdname MBGC
-
+#' @rdname MBGC
+#' @export
 MBGC_CC <- function(y,
                     G,
                     gating, # "C", "E", formula
@@ -386,8 +387,8 @@ MBGC_CC <- function(y,
   structure(result, class = 'MBGC')
 }
 
-# #' @rdname MBGC
-
+#' @rdname MBGC
+#' @export
 MBGC_CI <- function(y,
                     G,
                     gating, # "C", "E", formula
@@ -660,8 +661,8 @@ MBGC_CI <- function(y,
   structure(result, class = 'MBGC')
 }
 
-# #' @rdname MBGC
-
+#' @rdname MBGC
+#' @export
 MBGC_IC <- function(y,
                     G,
                     gating, # "C", "E", formula

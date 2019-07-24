@@ -8,7 +8,6 @@
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @examples
-#'
 #' \donttest{
 #' mod <- MBGR(modelName = "CE",
 #'             y=c("y1","y2"),
@@ -22,6 +21,7 @@
 #' summary(mod)
 #' }
 #'
+#' @export summary.MBGR
 #' @export
 
 summary.MBGR <- function(object, ...){
@@ -44,6 +44,7 @@ summary.MBGR <- function(object, ...){
 }
 
 #' @rdname summary.MBGR
+#' @export print.summary.MBGR
 #' @export
 
 print.summary.MBGR <- function(x, digits = getOption("digits"), ...)

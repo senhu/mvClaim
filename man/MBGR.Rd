@@ -68,7 +68,7 @@ Mixture of bivariate gamma regressions, or model-based clustering with bivariage
 }
 \examples{
 
-\donttest{
+\dontrun{
 m1 <- MBGR(modelName = "VV",
            y=c("y1","y2"), data = fullsim, G=2,
            f1     = ~ w1 + w2,

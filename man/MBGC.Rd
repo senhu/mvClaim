@@ -2,10 +2,22 @@
 % Please edit documentation in R/MBGC.R
 \name{MBGC}
 \alias{MBGC}
+\alias{MBGC_CC}
+\alias{MBGC_CI}
+\alias{MBGC_IC}
 \title{Mixture of bivariate gamma distributions clustering}
 \usage{
 MBGC(modelName = c("CC", "CI", "IC"), y, G, gating, data, maxit = 100,
   tol = 1e-04, initialization = "mclust", verbose = TRUE)
+
+MBGC_CC(y, G, gating, data, maxit = 200, tol = 1e-04,
+  initialization = "mclust", verbose = TRUE)
+
+MBGC_CI(y, G, gating, data, maxit = 200, tol = 1e-04,
+  initialization = "mclust", verbose = TRUE)
+
+MBGC_IC(y, G, gating, data, maxit = 200, tol = 1e-04,
+  initialization = "mclust", verbose = TRUE)
 }
 \arguments{
 \item{modelName}{A character string indicating which model to be fitted. Need to be one of "CC", "CI", "IC".}
@@ -58,8 +70,7 @@ An object of class \code{MBGC} providing the estimation results.
 Estimation using EM algorithm for mixture of bivariate gamma distributions
 }
 \examples{
-
-\donttest{
+\dontrun{
 clust1 <- MBGC(modelName = "CC", y=c("y1","y2"),
                G=2, gating = "C", data=gatingsim, verbose=FALSE)
 clust1

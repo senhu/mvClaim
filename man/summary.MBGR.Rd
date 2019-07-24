@@ -22,7 +22,6 @@
 Summary method for class "\code{MBGR}"
 }
 \examples{
-
 \donttest{
 mod <- MBGR(modelName = "CE",
             y=c("y1","y2"),

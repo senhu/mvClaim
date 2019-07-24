@@ -45,7 +45,6 @@ For BGR model, fitted values are plotted.
 Plot mixture of bivariate gamma regressions, or model-based clustering with bivariage gamma distributions and covariates: classification, uncertainty
 }
 \examples{
-
 \donttest{
 m1 <- MBGR(modelName = "CE", y=c("y1","y2"),
            data   = fullsim, G=2,

@@ -15,7 +15,6 @@
 #'   \item{tau.fit}{predicted mixing proportion values, if covariates enter the gating network.}
 #'
 #' @examples
-#'
 #' \donttest{
 #' mod1 <- BGR(modelName = "EE",
 #'             y = c("y1","y2"), data = fullsim,
@@ -43,6 +42,7 @@
 #' plot(fitted3$fit)
 #' }
 #'
+#' @export predict.BGR
 #' @export
 
 predict.BGR <- function(object, newdata, ...){
@@ -60,6 +60,10 @@ predict.BGR <- function(object, newdata, ...){
          stop("invalid model type name")
   )
 }
+
+#' @rdname predict.BGR
+#' @export predict_BGR_EE
+#' @export
 
 predict_BGR_EE <- function(object, newdata, ...){
 
@@ -89,6 +93,10 @@ predict_BGR_EE <- function(object, newdata, ...){
   return(result)
 }
 
+#' @rdname predict.BGR
+#' @export predict_BGR_EI
+#' @export
+
 predict_BGR_EI <- function(object, newdata, ...){
 
   l1.n    <- object$formula[[1]]
@@ -115,6 +123,10 @@ predict_BGR_EI <- function(object, newdata, ...){
   return(result)
 }
 
+#' @rdname predict.BGR
+#' @export predict_BGR_IE
+#' @export
+
 predict_BGR_IE <- function(object, newdata, ...){
   l4.n    <- object$formula
   matrix4 <- as.matrix(stats::model.matrix(l4.n, data=newdata))
@@ -133,9 +145,3 @@ predict_BGR_IE <- function(object, newdata, ...){
                  beta.fit   = b)
   return(result)
 }
-
-
-
-
-
-

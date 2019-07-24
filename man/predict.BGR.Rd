@@ -2,9 +2,18 @@
 % Please edit documentation in R/predict.BGR.R
 \name{predict.BGR}
 \alias{predict.BGR}
+\alias{predict_BGR_EE}
+\alias{predict_BGR_EI}
+\alias{predict_BGR_IE}
 \title{Predict Method for Bivariate Gamma Regressions}
 \usage{
 \method{predict}{BGR}(object, newdata, ...)
+
+predict_BGR_EE(object, newdata, ...)
+
+predict_BGR_EI(object, newdata, ...)
+
+predict_BGR_IE(object, newdata, ...)
 }
 \arguments{
 \item{object}{a fitted model object of class \code{"BGR"} or \code{"MBGR"}}
@@ -26,7 +35,6 @@ a list with components (depends on model class):
 Obtains predictions from the fitted bivariate gamma regression models.
 }
 \examples{
-
 \donttest{
 mod1 <- BGR(modelName = "EE",
             y = c("y1","y2"), data = fullsim,
