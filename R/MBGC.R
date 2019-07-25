@@ -39,7 +39,7 @@
 #'   \item{call}{The matched call.}
 #'   \item{trace}{All estimated coefficients and alpha, beta values in the EM algorithm.}
 #'
-#' @importFrom mclust Mclust
+#' @importFrom mclust Mclust mclustBIC
 #'
 #' @examples
 #' \dontrun{

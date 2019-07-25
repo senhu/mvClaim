@@ -56,7 +56,7 @@
 #' }
 #'
 #' @importFrom stats glm optim uniroot model.matrix Gamma formula runif coef optimHess
-#' @importFrom mclust Mclust
+#' @importFrom mclust Mclust mclustBIC
 #' @export
 
 MBGR <- function(modelName = c("VC","VI","VV","VE", "CV", "IV", "EV", "EC", "CE"),
