@@ -39,8 +39,6 @@
 #'   \item{call}{The matched call.}
 #'   \item{trace}{All estimated coefficients and alpha, beta values in the EM algorithm.}
 #'
-#' @importFrom mclust Mclust mclustBIC
-#'
 #' @examples
 #' \dontrun{
 #' clust1 <- MBGC(modelName = "CC", y=c("y1","y2"),
@@ -64,7 +62,7 @@
 #' }
 #'
 #' @importFrom stats uniroot Gamma formula coef optimHess
-#' @importFrom mclust Mclust mclustBIC
+#' @importFrom mclust mclustBIC
 #' @export
 
 MBGC <- function(modelName = c("CC","CI","IC"),
@@ -699,7 +697,7 @@ MBGC_IC <- function(y,
   #-----------------------------
   # starting values
   if (initialization=="mclust"){
-    initial.mclust <- Mclust(G=G, data = cbind(y1,y2), verbose = FALSE)
+    initial.mclust <- mclust::Mclust(G=G, data = cbind(y1,y2), verbose = FALSE)
     z.init      <- initial.mclust$z
 
     if (gating=="C"){
