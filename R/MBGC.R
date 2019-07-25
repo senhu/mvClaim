@@ -64,6 +64,7 @@
 #' }
 #'
 #' @importFrom stats uniroot Gamma formula coef optimHess
+#' @importFrom mclust Mclust mclustBIC
 #' @export
 
 MBGC <- function(modelName = c("CC","CI","IC"),
@@ -698,7 +699,7 @@ MBGC_IC <- function(y,
   #-----------------------------
   # starting values
   if (initialization=="mclust"){
-    initial.mclust <- mclust::Mclust(G=G, data = cbind(y1,y2), verbose = FALSE)
+    initial.mclust <- Mclust(G=G, data = cbind(y1,y2), verbose = FALSE)
     z.init      <- initial.mclust$z
 
     if (gating=="C"){
