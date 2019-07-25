@@ -165,6 +165,7 @@ BGE <- function(data,
                df         = noparams,
                AIC        = AIC,
                BIC        = BIC,
+               n          = n,
                iter       = (j-1),
                call       = tempcall)
   structure(result, class = c('BGE'))

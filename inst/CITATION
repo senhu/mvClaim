@@ -1,0 +1,36 @@
+citHeader("To cite 'mvClaim' in publications, please use:")
+
+citEntry(entry = "Article",
+         title        = "Bivariate gamma mixture of experts models for joint insurance claims modelling",
+         author       = personList(as.person("Sen Hu"),
+                                   as.person("T. Brendan. Murphy"),
+                                   as.person("Adrian O'Hagan")),
+         journal      = "To appear",
+         year         = "2019",
+         url          = "https://arxiv.org/abs/1904.04699",
+         archiveprefix= "arXiv",
+         eprint       = "1904.04699",
+         primaryclass = "stat.AP",
+
+         textVersion  =
+           paste("Hu, S., Murphy, T.B., and O'Hagan, A. (2019).",
+                 "Bivariate gamma mixture of experts models for joint insurance claims modelling.",
+                 "To appear.",
+                 "https://arxiv.org/abs/1904.04699")
+)
+
+citEntry(entry = "Manual",
+         title = "mvClaim: Mixture of experts models with bivariate gamma distributions",
+         author= personList(as.person("Sen Hu"),
+                            as.person("T. Brendan. Murphy"),
+                            as.person("Adrian O'Hagan")),
+         year  = "2019",
+         note  = "R package version 0.1.0",
+         url   = "https://github.com/senhu/mvClaim",
+
+         textVersion  =
+           paste("Hu, S., Murphy, T.B., and O'Hagan, A. (2019).",
+                 "mvClaim: Mixture of experts models with bivariate gamma distributions.",
+                 "R package version 0.1.0.",
+                 "https://github.com/senhu/mvClaim")
+)

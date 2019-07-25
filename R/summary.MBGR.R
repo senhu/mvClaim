@@ -28,6 +28,12 @@ summary.MBGR <- function(object, ...){
   title <- paste("Mixture of bivariate gamma regressions fitted by EM algorithm")
   modelfullname <- paste0(object$gating, object$modelName, collapse="")
 
+  gate <- ifelse(object$gating=="V", as.character(object$formula$gating[2]), "None")
+  expert1 <- ifelse(is.null(object$formula$f1), "None", as.character(object$formula$f1[2]))
+  expert2 <- ifelse(is.null(object$formula$f2), "None", as.character(object$formula$f2[2]))
+  expert3 <- ifelse(is.null(object$formula$f3), "None", as.character(object$formula$f3[2]))
+  expert4 <- ifelse(is.null(object$formula$f4), "None", as.character(object$formula$f4[2]))
+
   obj <- list(title = title,
               fullmodelName = modelfullname,
               n = object$n,
@@ -37,6 +43,11 @@ summary.MBGR <- function(object, ...){
               bic = object$BIC,
               aic = object$AIC,
               pro = object$pro,
+              gate= gate,
+              expert1 = expert1,
+              expert2 = expert2,
+              expert3 = expert3,
+              expert4 = expert4,
               classification = object$class
   )
   class(obj) <- "summary.MBGR"
@@ -59,6 +70,13 @@ print.summary.MBGR <- function(x, digits = getOption("digits"), ...)
              x$G, ifelse(x$G > 1, " components", " component"), ":"), "\n")
   cat("\n")
   #
+  cat("Gating Network Covariates:", x$gate, "\n")
+  cat("Alpha1 Expert Network Covariates:", x$expert1, "\n")
+  cat("Alpha2 Expert Network Covariates:", x$expert2, "\n")
+  cat("Alpha3 Expert Network Covariates:", x$expert3, "\n")
+  cat("Beta Expert Network Covariates:", x$expert4, "\n")
+  cat("\n")
+
   tab <- data.frame("log-likelihood" = x$loglike, "n" = x$n,
                     "df" = x$df, "BIC" = x$bic, "AIC" = x$aic,
                     row.names = "", check.names = FALSE)

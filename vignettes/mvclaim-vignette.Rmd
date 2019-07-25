@@ -1,5 +1,5 @@
 ---
-title: "Bivariate gamma mixture of experts models"
+title: "mvClaim: Bivariate Gamma Mixture of Experts Models"
 author: "Sen Hu"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -9,70 +9,122 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
+```{r setup, include = FALSE, message = FALSE, warning = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  out.width = "100%"
 )
 ```
 
-The `mvClaim` package provides a flexible modelling framework of mixture of experts (MoE) using bivariate gamma distributions, as introduced in Hu et al. (2019).
-It implements the bivariate gamma distribution proposed by Cheriyan (1941) and Ramabhadran (1951), which has not received much attention in the past. 
-Depends on the parameterization of the framework, its interpretation, and model parsimony issue, a family of models are implemented including: 
+The `mvClaim` package provides a flexible modelling framework of mixture of experts (MoE) using bivariate gamma distributions and a range of parsimonious parameterizations via the EM algorithm, as introduced in Hu et al. (2019).
+It utilizes the bivariate gamma distribution proposed by Cheriyan (1941) and Ramabhadran (1951), which has not received much attention in the past. 
+Depends on the parameterization of the framework, its interpretations, and whether to allow covriates incorporated into the mixing proportions and/or the bivariate gamma densities of the finite mixture models, a family of models are proposed, including: 
 
-* Bivariate gamma distribution estimation
-* Bivariate gamma regression
-* Mixture of bivariate gamma clustering
-* Mixture of bivariate gamma regressions (i.e. mixture of bivariate gamma clustering with covariates)
+* Bivariate gamma distribution estimation: implemented via the function `BGE` in the `mvClaim` package
+* Bivariate gamma regression: implemented via the function `BGR`, for `"EE"`, `"EI"` and `"IE"` model types
+* Mixture of bivariate gamma clustering: implemented via the function `MBGC`, for `"*CC"`, `"*CI"` and `"IC"` model types
+* Mixture of bivariate gamma regressions (i.e. mixture of bivariate gamma clustering with covariates): implemented via the function `MBGR`, for `"*VC"`, `"*VI"`, `"*VV"`, `"*VE"`, `"*CV"`, `"*IV"`, `"*EV"`, `"*EC"`, and `"*CE"` model types
 
+In this documents we illustrate two examples of bivariate gamma mixture of experts (MoE) models with two artificually simulated data sets (named `gatingsim` and `fullsim`, available in this package) while illustrating the main functions in the `mvClaim` package, closely following the simulation studies in Hu et al. (2019). 
 
-In this documents we illustrate two examples of bivariate gamma mixture of experts (MoE) models with two artificually simulated data sets, as well as illustrating some main functions in the `mvClaim` package. 
+# Installation
 
+You can install the latest development version of `mvClaim` from [GitHub](https://github.com/senhu/mvClaim): 
+``` {r eval = FALSE} 
+install.packages("devtools")
+devtools::install_github("senhu/mvClaim")
+```
+Then the package can be loaded with:
+``` {r eval = TRUE}
+library(mvClaim)
+```
 
 ## Example 1
 
+The first example is demonstrated using a simulated data set called `gatingsim` as illustrated in Hu et al (2019), and is availabe in the `mvClaim` package. 
+The data were simulated based on a gating network MoE, i.e. covariates were used only in the gating network to assist with identifying which component the observation was from. 
+The detailed simulation process can be found in Hu et al (2019). 
+The pairwise plot of the data is shown below. 
+``` {r echo = FALSE, fig.width=6, fig.height=4.5, fig.align="center"}
+data("gatingsim")
+my_cols <- c("#00AFBB", "#FC4E07")
+my_pch <- c(0,4)
+pairs(gatingsim[,1:5],
+      col=my_cols[gatingsim$label+1], 
+      pch=my_pch[gatingsim$label+1],
+      labels = expression("y"[1],"y"[2],"w"[1],"w"[2],"w"[3]),
+      cex=.5)
+```
 
-
-
-
-
+If assuming there is only one bivariate gamma distribution and no mixtures, and without considering covariates, the distribution parameters can be estimated via
+``` {r eval = FALSE, message = FALSE, warning = FALSE}
+est <- BGE(gatingsim[,1:2], verbose=FALSE, maxit=5)
+summary(est)
+```
+If assuming that the data are a mixture of bivariate gamma distributions and no covariates in the experts networks, there are three model types within this bivariate gamma MoE family: `"*CC"`, `"*CI"` and `"*IC"`. 
+Suppose the expert network is of type `"CC"` and the gating network is of type `"C"`, the mixture model can be fitted via: 
+``` {r eval = FALSE}
+m1 <- MBGC(modelName = "CC", y = c("y1","y2"), G = 2, gating = "C", data = gatingsim, maxit=5)
+summary(m1)
+m2 <- MBGC(modelName = "CC", y = c("y1","y2"), G = 3, gating = "C", data = gatingsim, maxit=5)
+m3 <- MBGC(modelName = "CC", y = c("y1","y2"), G = 4, gating = "C", data = gatingsim, maxit=5)
+m4 <- MBGC(modelName = "CC", y = c("y1","y2"), G = 5, gating = "C", data = gatingsim, maxit=5)
+```
+When fitting `G=1` in this case will be equivalent to fitting the `BGE` function. Model types can be set as `modelName = "CI"` or `"IC"`. Furthermore,covariates can enter the gating network with, for example `"gating = ~w1+w2+w3"`; in this case we know it is the true data generating process: 
+``` {r eval = FALSE}
+m5 <- MBGC(modelName = "CC", y=c("y1","y2"), G = 2, gating = ~w1+w2+w3, data = gatingsim, maxit=5)
+summary(m5)
+plot(m5, what = "classification")
+```
 
 ## Example 2
 
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+The second example is demonstrated using another simulated data set called `fullsim` as illustrated in Hu et al (2019), and is availabe in the `mvClaim` package. 
+The data were simulated based on a full MoE model, i.e. covariates were entering both the gating and experts networks.
+The detailed simulation process can be found in Hu et al (2019). 
+The pairwise plot of the data is shown below. 
+``` {r echo = FALSE, fig.width=6, fig.height=4.5, fig.align="center"}
+data("fullsim")
+my_cols <- c("#00AFBB", "#FC4E07")
+my_pch <- c(0,4)
+pairs(fullsim[,1:5], # upper.panel = NULL, 
+      col=my_cols[fullsim$label+1], 
+      pch=my_pch[fullsim$label+1],
+      cex=.5,
+      labels = expression("Y"[1],"Y"[2],"w"[1],"w"[2],"w"[3]))
+```
+Now we only consider the cases when covariates are entering the expert networks.
+In such cases, there are 9 different model types: "VC", "VI", "VV", "VE", "CV", "IV", "EV", "EC", "CE". 
+Typically model selection issue needs to be addressed if the true model is unknown. We recommend a stepwise forward selection starting from a null model, i.e. fitting one bivariate gamma distribution without covariates. 
+Then either add one extra component to the current optimal model, or change the model type, or add one covariate to any (combination) of the expert networks of the current model. If $G \geq 2$ covariates should also be added to the gating network. 
+More details can be found in Hu et al (2019).  
+This will lead to many models to be fitted. Here since the true model is known, it can be fitted via
+``` {r eval = FALSE}
+m6 <- MBGR(modelName = "VV", y=c("y1","y2"),
+           G=2, data = fullsim,
+           f1     = ~ w1 + w2,
+           f2     = ~ w2 + w3,
+           f3     = ~ w1 + w2 + w3,
+           f4     = ~ w1 + w2 + w3,
+           gating = ~ w1 + w2 + w3)
+summary(m6)
+plot(m6, what = "classification")
+```
+There is also a companying `fullsim.test` data set available in this package that has been simulated similarly for test data prediction purpose. 
+Based on the fitted model, predictions on the new data can be done via:
+```{r eval = FALSE}
+pred <- predict(m6, newdata=fullsim.test)
+```
+And the predictions are plotted in the following figure. 
+``` {r echo = FALSE, fig.width=6, fig.height=4.5, fig.align="center"}
+plot(fullsim.test$y1, fullsim.test$y2, 
+     xlab=expression("Y"[1]), ylab=expression("Y"[2]), pch=20, cex=.4,
+     cex.lab=1)
+#points(pred$fit, col="brown2", pch=15 )
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
+## Reference
 
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
-```
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+Hu, S., Murphy, T. B. and O'Hagan, A. (2019) Bivariate Gamma Mixture of Experts Models for Joint Claims Modeling. To appear. 

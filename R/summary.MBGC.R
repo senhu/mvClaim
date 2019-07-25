@@ -26,16 +26,42 @@
 summary.MBGC <- function(object, ...){
   title <- paste("Mixture of bivariate gamma clustering (MBGC) fitted by EM algorithm")
   modelfullname <- paste0(object$gating, object$modelName, collapse="")
-
+  G = object$G
+  comp <- NULL
+  rname <- NULL
+  switch(object$modelName,
+         CC = {
+           for (gg in (1:G)){
+             comp <- rbind(comp, c(object$alpha1[gg], object$alpha2[gg], object$alpha3[gg], object$beta[gg]))
+             rname <- c(rname, paste("component", gg, ": "))
+           }
+         },
+         CI = {
+           for (gg in (1:G)){
+             comp <- rbind(comp, c(object$alpha1[gg], object$alpha2[gg], object$alpha3[gg], object$beta))
+             rname <- c(rname, paste("component", gg, ": "))
+           }
+         },
+         IC = {
+           for (gg in (1:G)){
+             comp <- rbind(comp, c(object$alpha1, object$alpha2, object$alpha3, object$beta[gg]))
+             rname <- c(rname, paste("component", gg, ": "))
+           }
+         })
+  colnames(comp) <- c("alpha1", "alpha2", "alpha3", "beta")
+  rownames(comp) <- rname
+  gate <- ifelse(object$gating=="V", as.character(object$formula[2]), "None")
   obj <- list(title = title,
               fullmodelName = modelfullname,
               n = object$n,
-              G = object$G,
+              G = G,
               loglike = object$loglike,
               df = object$df,
               bic = object$BIC,
               aic = object$AIC,
               pro = object$pro,
+              parameters = comp,
+              gate = gate,
               classification = object$class
   )
   class(obj) <- "summary.MBGC"
@@ -57,9 +83,15 @@ print.summary.MBGC <- function(x, digits = getOption("digits"), ...)
   cat(paste0("MBGC ", x$fullmodelName," model with ",
              x$G, ifelse(x$G > 1, " components", " component"), ":"), "\n")
   cat("\n")
+
+  cat("Gating Network Covariates:", x$gate, "\n")
+  cat("\n")
+  cat("Estimated expert networks parameters:", "\n")
+  print(x$parameters, digits = digits)
+  cat("\n")
   #
   tab <- data.frame("log-likelihood" = x$loglike, "n" = x$n,
-                    "df" = x$df, "BIC" = x$bic, "AIC" = x$aic,
+                    "df" = x$df, "AIC" = x$aic, "BIC" = x$bic,
                     row.names = "", check.names = FALSE)
   print(tab, digits = digits)
   #

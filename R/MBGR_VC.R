@@ -302,8 +302,8 @@ MBGR_VC <- function(y,
   y2.residual <- y2 - y2.fitted
 
   # formula
-  f1.formula <- formula(paste(namey1, as.character(f1.new)[3], sep="~"))
-  f2.formula <- formula(paste(namey2, as.character(f2.new)[3], sep="~"))
+  f1.formula <- formula(paste("", as.character(f1.new)[3], sep="~"))
+  f2.formula <- formula(paste("", as.character(f2.new)[3], sep="~"))
   f3.formula <- formula(paste("", as.character(f3.new)[3], sep="~"))
   if (gating == "C") {
     newgating <- gating.formula <- "C" } else if (gating == "E") {
@@ -335,9 +335,9 @@ MBGR_VC <- function(y,
                df           = noparams,
                AIC          = AIC,
                BIC          = BIC,
-               Hessian      = list(hessian1 = hessian1,
-                                   hessian2 = hessian2,
-                                   hessian3 = hessian3),
+               Hessian      = list(Hessian1 = hessian1,
+                                   Hessian2 = hessian2,
+                                   Hessian3 = hessian3),
                n            = n,
                y            = cbind(y1, y2),
                Model.Matrix = list(Model.Matrix.1,
