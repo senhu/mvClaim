@@ -12,8 +12,7 @@ vignette: >
 ```{r setup, include = FALSE, message = FALSE, warning = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  out.width = "100%"
+  comment = "#>"
 )
 ```
 
@@ -40,7 +39,7 @@ Then the package can be loaded with:
 library(mvClaim)
 ```
 
-## Example 1
+# Example 1
 
 The first example is demonstrated using a simulated data set called `gatingsim` as illustrated in Hu et al (2019), and is availabe in the `mvClaim` package. 
 The data were simulated based on a gating network MoE, i.e. covariates were used only in the gating network to assist with identifying which component the observation was from. 
@@ -65,26 +64,26 @@ summary(est)
 If assuming that the data are a mixture of bivariate gamma distributions and no covariates in the experts networks, there are three model types within this bivariate gamma MoE family: `"*CC"`, `"*CI"` and `"*IC"`. 
 Suppose the expert network is of type `"CC"` and the gating network is of type `"C"`, the mixture model can be fitted via: 
 ``` {r eval = FALSE}
-m1 <- MBGC(modelName = "CC", y = c("y1","y2"), G = 2, gating = "C", data = gatingsim, maxit=5)
+m1 <- MBGC(modelName = "CC", y = c("y1","y2"), G = 2, gating = "C", data = gatingsim, maxit=5, verbose = FALSE)
 summary(m1)
-m2 <- MBGC(modelName = "CC", y = c("y1","y2"), G = 3, gating = "C", data = gatingsim, maxit=5)
-m3 <- MBGC(modelName = "CC", y = c("y1","y2"), G = 4, gating = "C", data = gatingsim, maxit=5)
-m4 <- MBGC(modelName = "CC", y = c("y1","y2"), G = 5, gating = "C", data = gatingsim, maxit=5)
+m2 <- MBGC(modelName = "CC", y = c("y1","y2"), G = 3, gating = "C", data = gatingsim, maxit=5, verbose = FALSE)
+m3 <- MBGC(modelName = "CC", y = c("y1","y2"), G = 4, gating = "C", data = gatingsim, maxit=5, verbose = FALSE)
+m4 <- MBGC(modelName = "CC", y = c("y1","y2"), G = 5, gating = "C", data = gatingsim, maxit=5, verbose = FALSE)
 ```
 When fitting `G=1` in this case will be equivalent to fitting the `BGE` function. Model types can be set as `modelName = "CI"` or `"IC"`. Furthermore,covariates can enter the gating network with, for example `"gating = ~w1+w2+w3"`; in this case we know it is the true data generating process: 
-``` {r eval = FALSE}
-m5 <- MBGC(modelName = "CC", y=c("y1","y2"), G = 2, gating = ~w1+w2+w3, data = gatingsim, maxit=5)
+``` {r eval = TRUE, fig.width=6, fig.height=4.5, fig.align="center"}
+m5 <- MBGC(modelName = "CC", y=c("y1","y2"), G = 2, gating = ~w1+w2+w3, data = gatingsim, maxit=5, verbose = FALSE)
 summary(m5)
-plot(m5, what = "classification")
+plot(m5, what = "classification", col=c("#00AFBB", "#FC4E07"), pch=c(0,4))
 ```
 
-## Example 2
+# Example 2
 
 The second example is demonstrated using another simulated data set called `fullsim` as illustrated in Hu et al (2019), and is availabe in the `mvClaim` package. 
 The data were simulated based on a full MoE model, i.e. covariates were entering both the gating and experts networks.
 The detailed simulation process can be found in Hu et al (2019). 
 The pairwise plot of the data is shown below. 
-``` {r echo = FALSE, fig.width=6, fig.height=4.5, fig.align="center"}
+``` {r eval = FALSE, echo = FALSE, fig.width=6, fig.height=4.5, fig.align="center"}
 data("fullsim")
 my_cols <- c("#00AFBB", "#FC4E07")
 my_pch <- c(0,4)
@@ -95,19 +94,19 @@ pairs(fullsim[,1:5], # upper.panel = NULL,
       labels = expression("Y"[1],"Y"[2],"w"[1],"w"[2],"w"[3]))
 ```
 Now we only consider the cases when covariates are entering the expert networks.
-In such cases, there are 9 different model types: "VC", "VI", "VV", "VE", "CV", "IV", "EV", "EC", "CE". 
+In such cases, there are 9 different model types: `"*VC"`, `"*VI"`, `"*VV"`, `"*VE"`, `"*CV"`, `"*IV"`, `"*EV"`, `"*EC"`, `"*CE"`.
 Typically model selection issue needs to be addressed if the true model is unknown. We recommend a stepwise forward selection starting from a null model, i.e. fitting one bivariate gamma distribution without covariates. 
 Then either add one extra component to the current optimal model, or change the model type, or add one covariate to any (combination) of the expert networks of the current model. If $G \geq 2$ covariates should also be added to the gating network. 
 More details can be found in Hu et al (2019).  
 This will lead to many models to be fitted. Here since the true model is known, it can be fitted via
-``` {r eval = FALSE}
+``` {r eval = FALSE, fig.width=4, fig.height=3, fig.align="center"}
 m6 <- MBGR(modelName = "VV", y=c("y1","y2"),
            G=2, data = fullsim,
            f1     = ~ w1 + w2,
            f2     = ~ w2 + w3,
            f3     = ~ w1 + w2 + w3,
            f4     = ~ w1 + w2 + w3,
-           gating = ~ w1 + w2 + w3)
+           gating = ~ w1 + w2 + w3, maxit = 5, verbose = FALSE)
 summary(m6)
 plot(m6, what = "classification")
 ```
@@ -117,11 +116,11 @@ Based on the fitted model, predictions on the new data can be done via:
 pred <- predict(m6, newdata=fullsim.test)
 ```
 And the predictions are plotted in the following figure. 
-``` {r echo = FALSE, fig.width=6, fig.height=4.5, fig.align="center"}
+``` {r eval = FALSE, echo = FALSE, fig.width=4, fig.height=3, fig.align="center"}
 plot(fullsim.test$y1, fullsim.test$y2, 
      xlab=expression("Y"[1]), ylab=expression("Y"[2]), pch=20, cex=.4,
      cex.lab=1)
-#points(pred$fit, col="brown2", pch=15 )
+# points(pred$fit, col="brown2", pch=15 )
 ```
 
 

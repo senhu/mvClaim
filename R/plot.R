@@ -63,18 +63,22 @@ plot.MBGR <- function(x, what="classification",
   main.title <- if ( isTRUE(main) ) what else if (is.character(main)) main else NULL
   if (is.null(col)) points.col <- object$class else {
     points.col <- rep(NULL, n)
-    for (gg in 1:G){ replace(points.col,(object$class==gg),col[gg]) }
+    for (gg in 1:G){ points.col <- replace(points.col,(object$class==gg),col[gg]) }
   }
   switch (what,
           classification = {
-            points.options <- c(0,16,3,2,23,4,11,5,15,1,6,7,8,9,10,12,13,14,17,18,19,20,21,22,24,25)
-            points.pch <- if (is.null(pch)) points.options[object$class] else pch
+            #points.options <- c(0,16,3,2,23,4,11,5,15,1,6,7,8,9,10,12,13,14,17,18,19,20,21,22,24,25)
+            #points.pch <- if (is.null(pch)) points.options[object$class] else pch
+            if (is.null(pch)) points.pch <- c(0:20)[object$class] else {
+              points.pch <- rep(NULL, n)
+              for (gg in 1:G){ points.pch <- replace(points.pch,(object$class==gg),pch[gg]) }
+            }
             plot(data, col=points.col, pch=points.pch,
-                 main=main.title, xlab=newxlab, ylab=newylab)
+                 main=main.title, xlab=newxlab, ylab=newylab, ...)
           },
           uncertainty = {
             plot(data,type="n",main=main.title, xlab=newxlab, ylab=newylab)
-            for (gg in 1:G) points(data[class==gg,], col=points.col[class==gg],cex=(1-z[class==gg,gg]), pch=16)
+            for (gg in 1:G) points(data[class==gg,], col=points.col[class==gg],cex=3*(1-z[class==gg,gg]), pch=16)
           },
           fitted = {
             plot(rbind(data,object$fitted.values),
@@ -134,19 +138,22 @@ plot.MBGC <- function(x, what="classification",
   main.title <- if ( isTRUE(main) ) what else if (is.character(main)) main else NULL
   if (is.null(col)) points.col <- object$class else {
     points.col <- rep(NULL, n)
-    for (gg in 1:G){ replace(points.col,(object$class==gg),col[gg]) }
+    for (gg in 1:G){ points.col <- replace(points.col,(object$class==gg),col[gg]) }
   }
   switch (what,
           classification = {
             #points.options <- c(0,16,3,2,23,4,11,5,15,1,6,7,8,9,10,12,13,14,17,18,19,20,21,22,24,25)
-            points.options <- c(0:14)
-            points.pch <- if (is.null(pch)) points.options[object$class] else pch
+            #points.pch <- if (is.null(pch)) c(0:20)[object$class] else pch
+            if (is.null(pch)) points.pch <- c(0:20)[object$class] else {
+              points.pch <- rep(NULL, n)
+              for (gg in 1:G){ points.pch <- replace(points.pch,(object$class==gg),pch[gg]) }
+            }
             plot(data, col=points.col, pch=points.pch,
-                 main=main.title, xlab=newxlab, ylab=newylab)
+                 main=main.title, xlab=newxlab, ylab=newylab, ...)
           },
           uncertainty = {
             plot(data,type="n",main=main.title, xlab=newxlab, ylab=newylab)
-            for (gg in 1:G) points(data[class==gg,], col=points.col[class==gg],cex=2*(1-z[class==gg,gg]), pch=16)
+            for (gg in 1:G) points(data[class==gg,], col=points.col[class==gg],cex=3*(1-z[class==gg,gg]), pch=16)
           },
           stop("invalid plot type.")
   )
