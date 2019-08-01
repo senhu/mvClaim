@@ -24,7 +24,7 @@
 #' @export
 
 summary.MBGC <- function(object, ...){
-  title <- paste("Mixture of bivariate gamma clustering (MBGC) fitted by EM algorithm")
+  title <- paste("Mixture of bivariate gamma clusterings (MBGC) fitted by EM algorithm")
   modelfullname <- paste0(object$gating, object$modelName, collapse="")
   G = object$G
   comp <- NULL
