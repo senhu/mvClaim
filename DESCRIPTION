@@ -1,5 +1,5 @@
 Package: mvClaim
-Title: Mixture of experts models with bivariate gamma distributions 
+Title: Multivariate general insurance claims modelling 
 Version: 0.1.0
 Authors@R: c(
     person("Sen", "Hu", email = "ethansen.hu@gmail.com", role = c("aut", "cre")),
@@ -8,7 +8,7 @@ Authors@R: c(
     )
 URL: https://github.com/senhu/mvClaim
 BugReports: https://github.com/senhu/mvClaim/issues
-Description: Use bivariate gamma mixture of experts model family to cluster and predict insurance claims data.
+Description: Use the bivariate gamma mixture of experts model family and finite mixtures of copulas to cluster and predict insurance claims data.
 Depends: R (>= 3.3.2)
 License: GPL (>=2)
 Encoding: UTF-8
@@ -20,7 +20,8 @@ Imports:
     distrEx,
     mclust,
     matrixStats,
-    matrixcalc
+    matrixcalc,
+    copula
 Suggests:
     knitr,
     rmarkdown

@@ -1,10 +1,10 @@
 ---
-title: "mvClaim: Bivariate Gamma Mixture of Experts Models"
-author: "Sen Hu"
-date: "`r Sys.Date()`"
+title: "mvClaim: Multivariate General Insurance Claims Modelling"
+author: "Sen Hu, Thomas Brendan Murphy, Adrian O'Hagan"
+# date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Bivariate gamma mixture of experts models}
+  %\VignetteIndexEntry{Multivariate general insurance claims modelling}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -25,9 +25,14 @@ Depending on the parameterization of the framework, its interpretations, and whe
 * Mixture of bivariate gamma clustering: implemented via the function `MBGC`, for `"*CC"`, `"*CI"` and `"IC"` model types.
 * Mixture of bivariate gamma regressions (i.e. mixture of bivariate gamma clusterings with covariates): implemented via the function `MBGR`, for `"*VC"`, `"*VI"`, `"*VV"`, `"*VE"`, `"*CV"`, `"*IV"`, `"*EV"`, `"*EC"`, and `"*CE"` model types.
 
-Detailed explanations about the model names such as `"EE"`, `"*VC"`, `"*VI"`, `"*VV"` can be found  in the original paper of Hu et al (2019); the notation `"*"` represents the gating network, which can be either `"E"`, `"C"` or `"V"`. This package vignette serves as supplementary material of Hu et al (2019).
+Detailed explanations about the model names such as `"EE"`, `"*VC"`, `"*VI"`, `"*VV"` can be found  in the original paper of Hu et al (2019); the notation `"*"` represents the gating network, which can be either `"E"`(equal), `"C"`(constant) or `"V"`(variable); within the expert networks, `"C"` represents constant density parameters without covariates, `"I"` represents idential density parameters without covariates, `"V"` represents variable parameter values depending on covariates, and `"E"` represents equal parameters depending on covariates. This package vignette serves as supplementary material of Hu et al (2019).
 
-In this document we illustrate two examples of bivariate gamma mixture of experts (MoE) models with two artificually simulated data sets (named `gatingsim` and `fullsim`, available in this package) while illustrating the main functions in the `mvClaim` package, closely following the simulation studies in Hu et al. (2019). 
+The `mvClaim` package also provides another mixture model framework of a finite mixture of copula regressions with gamma GLMs as marginal distributions, for the same purpuse as discussed in Hu & O'Hagan (2019), including
+
+* Copula regression with gamma marginal distributions: implemented via the function `copreg.gamma` in the `mvClaim` package.
+* Mixture of copula regressions with gamma GLMs marginal distributions (i.e. mixture of copulas clustering with covariates): implemented via the function `MCGR`.
+
+In this document we illustrate two examples of bivariate gamma mixture of experts (MoE) models with two artificually simulated data sets (named `gatingsim` and `fullsim`, available in this package) while illustrating the main relevant functions in the `mvClaim` package, closely following the simulation studies in Hu et al. (2019). 
 
 # Installation
 
@@ -47,7 +52,7 @@ The first example is demonstrated using a simulated data set called `gatingsim` 
 The data were simulated based on a gating network MoE, i.e. covariates were used only in the gating network to assist with identifying which component the observation was from. 
 The detailed simulation process can be found in Hu et al (2019). 
 The pairwise plot of the data is shown below. 
-``` {r echo = FALSE, fig.width=6, fig.height=4.5, fig.align="center"}
+``` {r echo = FALSE, fig.width=5, fig.height=4, fig.align="center"}
 data("gatingsim")
 my_cols <- c("#00AFBB", "#FC4E07")
 my_pch <- c(0,4)
@@ -72,7 +77,7 @@ m3 <- MBGC(modelName = "CC", y = c("y1","y2"), G = 3, gating = "C", data = gatin
 m4 <- MBGC(modelName = "CC", y = c("y1","y2"), G = 3, gating = "E", data = gatingsim)
 ```
 Fitting `G=1` in this case will be equivalent to using the `BGE` function. Model types can be set using `modelName = "CI"` or `"IC"`. Furthermore, covariates can enter the gating network with, for example `"gating = ~w1+w2+w3"`; For this example we know the true data generating process, which can be fitted via 
-``` {r eval = TRUE, fig.width=6, fig.height=4.5, fig.align="center"}
+``` {r eval = TRUE, fig.width=5, fig.height=3.5, fig.align="center"}
 m5 <- MBGC(modelName = "CC", y=c("y1","y2"), G = 2, gating = ~w1+w2+w3, data = gatingsim, verbose = FALSE)
 summary(m5)
 plot(m5, what = "classification", col=c("#00AFBB", "#FC4E07"), pch=c(0,4))
@@ -84,7 +89,7 @@ The second example is demonstrated using another simulated data set called `full
 The data were simulated based on a full MoE model, i.e. with covariates entering both the gating and experts networks.
 The detailed simulation process can be found in Hu et al (2019). 
 The pairwise plot of the data is shown below. 
-``` {r eval = FALSE, echo = FALSE, fig.width=6, fig.height=4.5, fig.align="center"}
+``` {r eval = TRUE, echo = FALSE, fig.width=5, fig.height=4, fig.align="center"}
 data("fullsim")
 my_cols <- c("#00AFBB", "#FC4E07")
 my_pch <- c(0,4)
@@ -100,7 +105,7 @@ Typically the model selection issue needs to be addressed if the true model is u
 Then either add one extra component to the current optimal model, or change the model type, or add one covariate to any (combination) of the expert networks of the current model. If $G \geq 2$, covariates should also be added to the gating network. 
 More details can be found in Hu et al (2019).  
 This will lead to many models to be fitted. Here, since the true model is known, it can be fitted via
-``` {r eval = TRUE, fig.width=6, fig.height=4.5, fig.align="center"}
+``` {r eval = TRUE, fig.width=5, fig.height=3.5, fig.align="center"}
 m6 <- MBGR(modelName = "VV", y=c("y1","y2"),
            G=2, data = fullsim,
            f1     = ~ w1 + w2,
@@ -117,17 +122,46 @@ Based on the fitted model, predictions on the new data can be done via:
 pred <- predict(m6, newdata=fullsim.test)
 ```
 And the predictions are plotted in the figure below. 
-``` {r eval = TRUE, echo = FALSE, fig.width=6, fig.height=4.5, fig.align="center"}
+``` {r eval = TRUE, echo = FALSE, fig.width=5, fig.height=3.5, fig.align="center"}
 plot(fullsim.test$y1, fullsim.test$y2, 
      xlab=expression("Y"[1]), ylab=expression("Y"[2]), pch=20, cex=.4,
      cex.lab=1)
 points(pred$fit, col="brown2", pch=15 )
 ```
 
+# Example 3
+
+Another example is briefly demonstrated here using a simulated data set called `simdat.mcgr` as illustrated in Hu and O'Hagan (2019). 
+The data were simulated based on a mixture of two copula regressions, i.e. covariates were used to estimate the marginal distributions to assist the mixture of copulas estimation. Details of the sample data simulation process can be found in Hu and O'Hagan (2019).
+``` {r}
+data("simdat.mcgr")
+```
+Because we know the true data generating process for the data set `simdat.mcgr`, based on which the model can be fitted via
+``` {r eval = FALSE}
+mod7 <- MCGR(copula = list(gumbelCopula(dim=2), frankCopula(dim=2)),
+             f1 = y1 ~ x1+x2,
+             f2 = y2 ~ x1+x2,
+             G = 2,
+             gating = "C"
+             data=simdat.mcgr)
+```
+If `G=1`, as an alternative, copula regression with gamma GLMs as marginals (no mixtures) can be fitted via, for example:
+``` {r eval = FALSE}
+mod8 <- copreg.gamma(f1 = y1 ~ x1+x2,
+                     f2 = y2 ~ x1+x2,
+                     copula = gumbelCopula(dim=2),
+                     data = simdat.mcgr)
+```
+
+
 ---------
 
 ## Reference
 
-* Hu, S., Murphy, T. B. and O'Hagan, A. (2019) Bivariate Gamma Mixture of Experts Models for Joint Claims Modeling. To appear. https://arxiv.org/abs/1904.04699 .
-* Cheriyan, K. (1941) A bivariate correlated gamma-type distribution  function. _Journal of the Indian Mathematical Society_, __5__, pp. 133-144. 
-* Ramabhadran, V. (1951) A multivariate gamma-type distribution. _Sankhya_, __11__, pp. 45-46.
+1. Hu, S., Murphy, T. B. and O'Hagan, A. (2019) Bivariate Gamma Mixture of Experts Models for Joint Claims Modeling. To appear.
+
+2. Hu, S. and O'Hagan, A. (2019) Copula Averaging for Tail Dependence in General Insurance Claims Data. To appear.
+
+3. Cheriyan, K. (1941) A bivariate correlated gamma-type distribution  function. _Journal of the Indian Mathematical Society_, __5__, pp. 133-144.
+
+4. Ramabhadran, V. (1951) A multivariate gamma-type distribution. _Sankhya_, __11__, pp. 45-46.

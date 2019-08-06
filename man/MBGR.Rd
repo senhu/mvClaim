@@ -67,15 +67,15 @@ An object of class \code{BGR} providing the estimation results.
 Mixture of bivariate gamma regressions, or model-based clustering with bivariage gamma distributions and covariates, for various parsimonious model types. Models are estimated by EM algorithm.
 }
 \examples{
-
-\dontrun{
+\donttest{
 m1 <- MBGR(modelName = "VV",
            y=c("y1","y2"), data = fullsim, G=2,
            f1     = ~ w1 + w2,
            f2     = ~ w2 + w3,
            f3     = ~ w1 + w2 + w3,
            f4     = ~ w1 + w2 + w3,
-           gating = "C")
+           gating = "C",
+           verbose = FALSE)
 }
 
 }

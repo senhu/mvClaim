@@ -64,30 +64,29 @@ An object of class \code{MBGC} providing the estimation results.
   \item{n}{The number of observations in the data.}
   \item{Hessian}{The Hessian matrix at the estimated values}
   \item{call}{The matched call.}
-  \item{trace}{All estimated coefficients and alpha, beta values in the EM algorithm.}
 }
 \description{
 Estimation using EM algorithm for mixture of bivariate gamma distributions
 }
 \examples{
-\dontrun{
+\donttest{
 clust1 <- MBGC(modelName = "CC", y=c("y1","y2"),
                G=2, gating = "C", data=gatingsim, verbose=FALSE)
 clust1
 clust2 <- MBGC(modelName = "CI", y=c("y1","y2"),
-               G=2, gating = "C", data=gatingsim)
+               G=2, gating = "C", data=gatingsim, verbose=FALSE)
 clust2
 clust3 <- MBGC(modelName = "IC", y=c("y1","y2"),
-               G=2, gating = "C", data=gatingsim)
+               G=2, gating = "C", data=gatingsim, verbose=FALSE)
 clust3
 clust4 <- MBGC(modelName = "CC", y=c("y1","y2"),
-               G=2, gating = ~w1+w2+w3, data=gatingsim)
+               G=2, gating = ~w1+w2+w3, data=gatingsim, verbose=FALSE)
 clust4
 clust5 <- MBGC(modelName = "CI", y=c("y1","y2"),
-               G=2, gating = ~w1+w2+w3, data=gatingsim)
+               G=2, gating = ~w1+w2+w3, data=gatingsim, verbose=FALSE)
 clust5
 clust6 <- MBGC(modelName = "IC", y=c("y1","y2"),
-               G=2, gating = ~w1+w2+w3, data=gatingsim)
+               G=2, gating = ~w1+w2+w3, data=gatingsim, verbose=FALSE)
 clust6
 }
 

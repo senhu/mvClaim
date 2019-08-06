@@ -44,15 +44,15 @@
 #'   \item{Model.Matrix}{The used model matrix for each regression formula.}
 #'
 #' @examples
-#'
-#' \dontrun{
+#' \donttest{
 #' m1 <- MBGR(modelName = "VV",
 #'            y=c("y1","y2"), data = fullsim, G=2,
 #'            f1     = ~ w1 + w2,
 #'            f2     = ~ w2 + w3,
 #'            f3     = ~ w1 + w2 + w3,
 #'            f4     = ~ w1 + w2 + w3,
-#'            gating = "C")
+#'            gating = "C",
+#'            verbose = FALSE)
 #' }
 #'
 #' @importFrom stats glm optim uniroot model.matrix Gamma formula runif coef optimHess
