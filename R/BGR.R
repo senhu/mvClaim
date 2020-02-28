@@ -69,9 +69,9 @@ BGR <- function(modelName = c("EE","EI","IE"),
                 f2,
                 f3,
                 f4,
-                maxit=100,
+                maxit=300,
                 tol=1e-5,
-                verbose=TRUE){
+                verbose=FALSE){
   switch(modelName,
          EE = {    # BGR.EE: all alpha's and beta are regressed on covariates
            if (is.null(f1)){ stop("f1 must be supplied for EE model type") }
@@ -111,9 +111,9 @@ BGR_EE <- function(y,
                    f2,
                    f3,
                    f4,
-                   maxit  = 100,
+                   maxit  = 300,
                    tol    = 1e-5,
-                   verbose= TRUE){
+                   verbose= FALSE){
   options(warn=-1)
   tempcall<-as.call(c(expression(BGR),list(y       = y,
                                            data    = substitute(data),
@@ -334,10 +334,10 @@ BGR_EE <- function(y,
   f4.formula <- formula(paste("", as.character(f4.new)[3], sep="~"))
 
   result<-list(modelName   = "EE",
-               coefficients= list(f1.coef=coef1.new,
-                                  f2.coef=coef2.new,
-                                  f3.coef=coef3.new,
-                                  f4.coef=coef4.new),
+               coefficients= list(f1=coef1.new,
+                                  f2=coef2.new,
+                                  f3=coef3.new,
+                                  f4=coef4.new),
                alpha1      = alpha1.current,
                alpha2      = alpha2.current,
                alpha3      = alpha3.current,
@@ -373,9 +373,9 @@ BGR_EI <- function(y,
                    f1,
                    f2,
                    f3,
-                   maxit  = 100,
+                   maxit  = 300,
                    tol    = 1e-5,
-                   verbose= TRUE){
+                   verbose= FALSE){
   options(warn=-1)
   tempcall <- as.call( c(expression(BGR), list(y       = y,
                                                data    = substitute(data),
@@ -559,9 +559,9 @@ BGR_EI <- function(y,
   f3.formula <- formula(paste("", as.character(f3.new)[3], sep="~"))
 
   result<-list(modelName   = "EI",
-               coefficients= list(f1.coef=coef1.new,
-                                  f2.coef=coef2.new,
-                                  f3.coef=coef3.new),
+               coefficients= list(f1=coef1.new,
+                                  f2=coef2.new,
+                                  f3=coef3.new),
                alpha1      = alpha1.current,
                alpha2      = alpha2.current,
                alpha3      = alpha3.current,
@@ -593,9 +593,9 @@ BGR_EI <- function(y,
 BGR_IE <- function(y,
                    data,
                    f4,
-                   maxit  = 100,
+                   maxit  = 300,
                    tol    = 1e-5,
-                   verbose= TRUE){
+                   verbose= FALSE){
   options(warn=-1)
   tempcall<-as.call(c(expression(BGR),list(y       = y,
                                            data    = substitute(data),
@@ -754,7 +754,7 @@ BGR_IE <- function(y,
   f4.formula <- formula(paste("", as.character(f4.new)[3], sep="~"))
 
   result<-list(modelName   = "IE",
-               coefficients= coef4.new,
+               coefficients= list(f4=coef4.new),
                alpha1      = alpha1.current,
                alpha2      = alpha2.current,
                alpha3      = alpha3.current,
@@ -769,8 +769,8 @@ BGR_IE <- function(y,
                BIC         = BIC,
                y           = cbind(y1, y2),
                n           = n,
-               Model.Matrix= Model.Matrix.4,
-               formula     = f4.formula,
+               Model.Matrix= list(Model.Matrix.4),
+               formula     = list(f4.formula),
                call        = tempcall,
                iter        = j-1)
   options(warn=0)

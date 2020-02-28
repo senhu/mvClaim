@@ -1,6 +1,3 @@
-#-------------------------------------
-# Method 4:
-#--------------------------------------
 
 MBGR_VV <- function(y,
                     data,
@@ -11,9 +8,9 @@ MBGR_VV <- function(y,
                     f4,
                     gating,
                     initialization = "mclust",
-                    maxit   = 200,
+                    maxit   = 300,
                     tol     = 1e-5,
-                    verbose = TRUE){
+                    verbose = FALSE){
   options(warn=-1)
   tempcall<-as.call(c(expression(MBGR.VV),list(y      = y,
                                               data   = substitute(data),
@@ -133,9 +130,7 @@ MBGR_VV <- function(y,
   j               <- 1
 
   while ( (loglike.diff > tol) && (j <= maxit) ) {
-    #-------
-    #E step
-    #-------
+
     Expected.x3    <- matrix(0,nrow=n, ncol=G)
     Expected.x1    <- matrix(0,nrow=n, ncol=G)
     Expected.x2    <- matrix(0,nrow=n, ncol=G)
@@ -177,9 +172,6 @@ MBGR_VV <- function(y,
       cat(c("iter:", j, "; current loglike:", round(loglike.new,6), "; loglike change:", round(loglike.diff,6), "\n"))
     }
 
-    #--------
-    # M step
-    #--------
     if (gating == "C"){
       p.z.new        <- colSums(z.new)/n
       coef.p.new     <- NULL
@@ -312,7 +304,6 @@ MBGR_VV <- function(y,
     cat("Hessian matrix is not negative-definite.", "\n")
   }
 
-  #	calculation of BIC and AIC for bivpoisson model
   if (gating=="C"){
     noparams <- G*(dim(coef1.current)[1]) + G*(dim(coef2.current)[1]) + G*(dim(coef3.current)[1]) + G*(dim(coef4.current)[1]) + (G-1)
   } else if (gating=="E"){
@@ -325,7 +316,6 @@ MBGR_VV <- function(y,
   BIC<- -2*loglike[j-1] + noparams * log(n)
   classification <- apply(z.new, 1, which.max)
 
-  # fitted values
   if (gating=="C" || gating=="E"){
     y1.fitted <- ((alpha1.current + alpha3.current) / beta.current) %*% p.z.current
     y2.fitted <- ((alpha2.current + alpha3.current) / beta.current) %*% p.z.current
@@ -336,7 +326,6 @@ MBGR_VV <- function(y,
   y1.residual <- y1 - y1.fitted
   y2.residual <- y2 - y2.fitted
 
-  # formula
   f1.formula <- formula(paste("", as.character(f1.new)[3], sep="~"))
   f2.formula <- formula(paste("", as.character(f2.new)[3], sep="~"))
   f3.formula <- formula(paste("", as.character(f3.new)[3], sep="~"))
@@ -347,7 +336,12 @@ MBGR_VV <- function(y,
         gating.formula <- formula(paste("", as.character(gating.new)[3], sep="~"))
         newgating <- "V"}
 
-  #  Calculation of output
+  colnames(coef1.current)<-colnames(coef2.current)<-colnames(coef3.current)<-colnames(coef4.current)<-paste0("g=", c(1:G))
+  rownames(coef1.current)<-c("(Intercept)",unlist(strsplit(as.character(f1.formula)[2]," + ",fixed = TRUE)))
+  rownames(coef2.current)<-c("(Intercept)",unlist(strsplit(as.character(f2.formula)[2]," + ",fixed = TRUE)))
+  rownames(coef3.current)<-c("(Intercept)",unlist(strsplit(as.character(f3.formula)[2]," + ",fixed = TRUE)))
+  rownames(coef4.current)<-c("(Intercept)",unlist(strsplit(as.character(f4.formula)[2]," + ",fixed = TRUE)))
+
   result<-list(modelName    = "VV",
                gating       = newgating,
                coefficients = list(expert = list(alpha1 = coef1.current,

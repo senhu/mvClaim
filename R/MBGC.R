@@ -69,10 +69,10 @@ MBGC <- function(modelName = c("CC","CI","IC"),
                  G,
                  gating,
                  data,
-                 maxit = 100,
-                 tol   = 1e-4,
+                 maxit = 300,
+                 tol   = 1e-5,
                  initialization = "mclust",
-                 verbose = TRUE){
+                 verbose = FALSE){
   switch(modelName,
          CC = {
            res <- MBGC_CC(y=y, G=G, gating=gating, data=data,
@@ -109,12 +109,12 @@ print.MBGC <- function (x, ...){
 #' @export
 MBGC_CC <- function(y,
                     G,
-                    gating, # "C", "E", formula
+                    gating,
                     data,
-                    maxit   = 200,
-                    tol     = 1e-4,
+                    maxit   = 300,
+                    tol     = 1e-5,
                     initialization = "mclust",
-                    verbose = TRUE){
+                    verbose = FALSE){
   options(warn=-1)
   tempcall<-as.call(c(expression(MBGC.CC), list(y      = y,
                                                 G      = G,
@@ -389,12 +389,12 @@ MBGC_CC <- function(y,
 #' @export
 MBGC_CI <- function(y,
                     G,
-                    gating, # "C", "E", formula
+                    gating,
                     data,
-                    maxit   = 200,
-                    tol     = 1e-4,
+                    maxit   = 300,
+                    tol     = 1e-5,
                     initialization = "mclust",
-                    verbose = TRUE){
+                    verbose = FALSE){
   options(warn=-1)
   tempcall<-as.call(c(expression(MBGC.CI),list(y      = y,
                                                G      = G,
@@ -663,12 +663,12 @@ MBGC_CI <- function(y,
 #' @export
 MBGC_IC <- function(y,
                     G,
-                    gating, # "C", "E", formula
+                    gating,
                     data,
-                    maxit   = 200,
-                    tol     = 1e-4,
+                    maxit   = 300,
+                    tol     = 1e-5,
                     initialization = "mclust",
-                    verbose = TRUE){
+                    verbose = FALSE){
   options(warn=-1)
   tempcall<-as.call(c(expression(MBGC), list(y      = y,
                                              G      = G,

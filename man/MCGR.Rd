@@ -5,7 +5,7 @@
 \title{Mixture of Copula Regressions with Gamma Marginal Distributions}
 \usage{
 MCGR(copula, f1, f2, G, data, gating, initialization = "mclust",
-  maxit = 100, tol = 1e-05, verbose = TRUE)
+  maxit = 300, tol = 1e-05, verbose = FALSE)
 }
 \arguments{
 \item{copula}{A specified copula, from the \code{copula} package. Must be a list of copulas or a list of one copula, matching G}
@@ -29,7 +29,7 @@ MCGR(copula, f1, f2, G, data, gating, initialization = "mclust",
 \item{verbose}{A logical controlling whether estimations in each EM iteration are shown in the fitting process. The default is TRUE.}
 }
 \value{
-An object of class \code{BGR} providing the estimation results.
+An object of class \code{MCGR} providing the estimation results.
   The details of the output components are:
   \item{call}{The matched call.}
   \item{coefficients}{The estimated coefficients in the expert and gating networks, if exists.}

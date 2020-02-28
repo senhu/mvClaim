@@ -20,7 +20,7 @@ citEntry(entry = "Article",
 )
 
 citEntry(entry = "Manual",
-         title = "mvClaim: Mixture of experts models with bivariate gamma distributions",
+         title = "mvClaim: multivariate general insurance claims modelling",
          author= personList(as.person("Sen Hu"),
                             as.person("T. Brendan. Murphy"),
                             as.person("Adrian O'Hagan")),
@@ -30,7 +30,7 @@ citEntry(entry = "Manual",
 
          textVersion  =
            paste("Hu, S., Murphy, T.B., and O'Hagan, A. (2019).",
-                 "mvClaim: Mixture of experts models with bivariate gamma distributions.",
+                 "mvClaim: multivariate general insurance claims modelling.",
                  "R package version 0.1.0.",
                  "https://github.com/senhu/mvClaim")
 )

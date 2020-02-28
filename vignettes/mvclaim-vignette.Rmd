@@ -32,9 +32,9 @@ The `mvClaim` package also provides another mixture model framework of a finite 
 * Copula regression with gamma marginal distributions: implemented via the function `copreg.gamma` in the `mvClaim` package.
 * Mixture of copula regressions with gamma GLMs marginal distributions (i.e. mixture of copulas clustering with covariates): implemented via the function `MCGR`.
 
-In this document we illustrate two examples of bivariate gamma mixture of experts (MoE) models with two artificually simulated data sets (named `gatingsim` and `fullsim`, available in this package) while illustrating the main relevant functions in the `mvClaim` package, closely following the simulation studies in Hu et al. (2019). 
+In this document we illustrate two examples of bivariate gamma mixture of experts (MoE) models with two artificually simulated data sets (named `gatingsim` and `fullsim`, available in this package) while illustrating the main relevant functions in the `mvClaim` package, closely following the simulation studies in Hu et al. (2019); the third example illustrates the functions for the (mixtures of) copula regressions with a simulated data set, following the simulation study in Hu and O'Hagan (2019). 
 
-# Installation
+## Installation
 
 You can install the latest development version of `mvClaim` from [GitHub](https://github.com/senhu/mvClaim): 
 ``` {r eval = FALSE} 
@@ -46,7 +46,7 @@ Then the package can be loaded with:
 library(mvClaim)
 ```
 
-# Example 1
+## Example 1
 
 The first example is demonstrated using a simulated data set called `gatingsim` as illustrated in Hu et al (2019), which is availabe in the `mvClaim` package. 
 The data were simulated based on a gating network MoE, i.e. covariates were used only in the gating network to assist with identifying which component the observation was from. 
@@ -83,7 +83,7 @@ summary(m5)
 plot(m5, what = "classification", col=c("#00AFBB", "#FC4E07"), pch=c(0,4))
 ```
 
-# Example 2
+## Example 2
 
 The second example is demonstrated using another simulated data set called `fullsim` as illustrated in Hu et al (2019), and is availabe in the `mvClaim` package. 
 The data were simulated based on a full MoE model, i.e. with covariates entering both the gating and experts networks.
@@ -129,7 +129,7 @@ plot(fullsim.test$y1, fullsim.test$y2,
 points(pred$fit, col="brown2", pch=15 )
 ```
 
-# Example 3
+## Example 3
 
 Another example is briefly demonstrated here using a simulated data set called `simdat.mcgr` as illustrated in Hu and O'Hagan (2019). 
 The data were simulated based on a mixture of two copula regressions, i.e. covariates were used to estimate the marginal distributions to assist the mixture of copulas estimation. Details of the sample data simulation process can be found in Hu and O'Hagan (2019).

@@ -13,7 +13,7 @@
 \alias{predict_MBGR_CE}
 \title{Predict Method for Bivariate Gamma Regressions}
 \usage{
-\method{predict}{MBGR}(object, newdata, ...)
+predict.MBGR(object, newdata, ...)
 
 predict_MBGR_VC(object, newdata)
 

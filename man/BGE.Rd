@@ -4,7 +4,7 @@
 \alias{BGE}
 \title{Bivariate Gamma Distribution Estimation}
 \usage{
-BGE(data, maxit = 200, tol = 1e-05, start = NULL, verbose = TRUE)
+BGE(data, maxit = 300, tol = 1e-05, start = NULL, verbose = FALSE)
 }
 \arguments{
 \item{data}{A numeric vector, matrix or data frame of observations. Categorical variables are not allowed. If a matrix or data frame, rows correspond to observations and columns correspond to variables.}

@@ -18,7 +18,7 @@
 \arguments{
 \item{x}{Output from MBGR functions.}
 
-\item{what}{The type of graph requested, either \code{"classification"} or \code{"uncertainty"}.}
+\item{what}{The type of graph requested, either \code{"classification"}, or \code{"uncertainty"}, or \code{"fitted"}.}
 
 \item{col}{The colors of points in clusters.}
 
@@ -37,7 +37,7 @@ For BGR model, fitted values are plotted.
   \item{what=="classification"}{a plot showing the clustering labels.}
   \item{what=="uncertainty"}{a plot of classification uncertainty.}
   \item{what=="fitted"}{a plot of fitted values.}
-  For MBGR model:
+  For MBGC model:
   \item{what=="classification"}{a plot showing the clustering labels.}
   \item{what=="uncertainty"}{a plot of classification uncertainty.}
 }

@@ -8,14 +8,15 @@
 \title{Bivariate Gamma Regression}
 \usage{
 BGR(modelName = c("EE", "EI", "IE"), y, data, f1, f2, f3, f4,
-  maxit = 100, tol = 1e-05, verbose = TRUE)
+  maxit = 300, tol = 1e-05, verbose = FALSE)
 
-BGR_EE(y, data, f1, f2, f3, f4, maxit = 100, tol = 1e-05,
-  verbose = TRUE)
+BGR_EE(y, data, f1, f2, f3, f4, maxit = 300, tol = 1e-05,
+  verbose = FALSE)
 
-BGR_EI(y, data, f1, f2, f3, maxit = 100, tol = 1e-05, verbose = TRUE)
+BGR_EI(y, data, f1, f2, f3, maxit = 300, tol = 1e-05,
+  verbose = FALSE)
 
-BGR_IE(y, data, f4, maxit = 100, tol = 1e-05, verbose = TRUE)
+BGR_IE(y, data, f4, maxit = 300, tol = 1e-05, verbose = FALSE)
 }
 \arguments{
 \item{modelName}{A character string indicating which model to be fitted. Need to be one of "EE", "EI", "IE".}

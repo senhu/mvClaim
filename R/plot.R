@@ -3,7 +3,7 @@
 #' Plot mixture of bivariate gamma regressions, or model-based clustering with bivariage gamma distributions and covariates: classification, uncertainty
 #'
 #' @param x Output from MBGR functions.
-#' @param what The type of graph requested, either \code{"classification"} or \code{"uncertainty"}.
+#' @param what The type of graph requested, either \code{"classification"}, or \code{"uncertainty"}, or \code{"fitted"}.
 #' @param xlab,ylab Optional labels for the x-axis and the y-axis.
 #' @param col The colors of points in clusters.
 #' @param pch The plotting characters or symbols in clusters.
@@ -16,7 +16,7 @@
 #'   \item{what=="classification"}{a plot showing the clustering labels.}
 #'   \item{what=="uncertainty"}{a plot of classification uncertainty.}
 #'   \item{what=="fitted"}{a plot of fitted values.}
-#'   For MBGR model:
+#'   For MBGC model:
 #'   \item{what=="classification"}{a plot showing the clustering labels.}
 #'   \item{what=="uncertainty"}{a plot of classification uncertainty.}
 #'

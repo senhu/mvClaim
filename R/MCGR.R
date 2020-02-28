@@ -13,7 +13,7 @@
 #' @param tol A parameter that controls the convergence tolerance in the EM algorithm. The default is 1e-5.
 #' @param verbose A logical controlling whether estimations in each EM iteration are shown in the fitting process. The default is TRUE.
 #'
-#' @return An object of class \code{BGR} providing the estimation results.
+#' @return An object of class \code{MCGR} providing the estimation results.
 #'   The details of the output components are:
 #'   \item{call}{The matched call.}
 #'   \item{coefficients}{The estimated coefficients in the expert and gating networks, if exists.}
@@ -59,9 +59,9 @@ MCGR <- function(copula,
                  data,
                  gating,
                  initialization = "mclust",
-                 maxit   = 100,
+                 maxit   = 300,
                  tol     = 1e-5,
-                 verbose = TRUE){
+                 verbose = FALSE){
   tempcall <- as.call(c(expression(MCGR),list(copula = copula,
                                               f1     = f1,
                                               f2     = f2,
@@ -139,11 +139,10 @@ MCGR <- function(copula,
       }
     }
     if (G==1){
-      z.init         <- rep(1,n)
+      z.init <- rep(1,n)
       if (gating == "C" || gating == "E"){
-        tau.current      <- 1
-      } else {
-        tau.current    <- rep(1,n) }
+        tau.current <- 1
+      } else { tau.current <- rep(1,n) }
       index <- rep(1,n)
       m1 <- stats::glm(f1,family=Gamma(link="log"),data=data)
       m2 <- stats::glm(f2,family=Gamma(link="log"),data=data)
@@ -151,8 +150,7 @@ MCGR <- function(copula,
         copula::fitCopula(coplist[[1]],copula::pobs(y),
                           method = "mpl", optim.method="Nelder-Mead")@estimate
       }, error = function(err){
-        err.temp <- copula::fitCopula(coplist[[1]],copula::pobs(y),
-                                      method = "itau")@estimate
+        err.temp <- copula::fitCopula(coplist[[1]],copula::pobs(y), method = "itau")@estimate
         return(err.temp)
       })
       theta.current <- list(c(m1$coefficients,
@@ -162,9 +160,10 @@ MCGR <- function(copula,
                               a.temp))
     }
   } #end of initialization
+
   if (class(initialization) == "Mclust"){
     if (G>1){
-      z.init         <- initialization$z
+      z.init <- initialization$z
       if (gating == "C"){
         tau.current        <- initialization$parameters$pro
       } else if (gating == "E"){
@@ -217,16 +216,14 @@ MCGR <- function(copula,
                               log(MASS::gamma.shape(m2)$alpha),
                               a.temp))
     }
-  } #end of initialization
+  }
 
   loglike.diff    <- 1000
   loglike.current <- -sqrt(.Machine$double.eps)
   loglike         <- rep(0,maxit)
   j               <- 1
   while ( (loglike.diff > tol) && (j <= maxit) ) {
-    #-------------
-    # E-step
-    #-------------
+
     logden <- matrix(0,nrow=n, ncol=G)
     for (i in seq_len(n)){
       for (g in seq_len(G)){
@@ -235,7 +232,6 @@ MCGR <- function(copula,
                                        xmat=list(model.matrix.1[i,],
                                             model.matrix.2[i,]),
                                        copula=coplist[[g]])
-        #print(c(i,g))
       }
     }
     if (gating=="C" || gating=="E"){
@@ -250,9 +246,7 @@ MCGR <- function(copula,
     if (verbose){
       cat(c("iter:", j, "; current loglike:", round(loglike.new,4), "; loglike change:", round(loglike.diff,4), "\n"))
     }
-    #-------------
-    # M-step
-    #-------------
+
     if (gating == "C"){
       tau.new        <- colSums(z.new)/n
       coef.p.new     <- NULL
@@ -265,7 +259,7 @@ MCGR <- function(copula,
           coef.p.new <- stats::coef(mp)
           tau.new    <- stats::predict(mp, type="probs") }
 
-    # max all parameters together
+
     theta.new <- theta.current
     for (g in c(1:G)){
       fit <- stats::optim(theta.current[[g]], Q.function,
@@ -275,7 +269,6 @@ MCGR <- function(copula,
                           copula  = coplist[[g]],
                           z.mat   = z.new[,g],
                           method  = "Nelder-Mead")
-      #if (fit$convergence != 0) cat("optim not converged at G=",g, ". \n")
       theta.new[[g]] <- fit$par
     }
 
@@ -286,7 +279,7 @@ MCGR <- function(copula,
     theta.current  <- theta.new
     tau.current    <- tau.new
     j              <- j+1
-  } # end of EM
+  }
 
   if (!all(loglike[1:(j-1)] == cummax(loglike[1:(j-1)]))){
     cat("Loglikelihood is not strictly monotonically increasing!", "\n")
@@ -303,8 +296,8 @@ MCGR <- function(copula,
   BIC<- -2*loglike[j-1] + noparams * log(n)
   classification <- apply(z.new, 1, which.max)
 
-  coef1 <- rep(list(NULL),G)
-  coef2 <- rep(list(NULL),G)
+  coef1 <- NULL #rep(list(NULL),G)
+  coef2 <- NULL #rep(list(NULL),G)
   shape1 <- rep(0,G)
   shape2 <- rep(0,G)
   pcop <- rep(list(NULL),G)
@@ -312,11 +305,11 @@ MCGR <- function(copula,
   fitval2 <- matrix(0, nrow=n, ncol=G)
   for (g in c(1:G)){
     finparam <- theta.current[[g]]
-    coef1[[g]] <- finparam[1:(l1-1)]
-    coef2[[g]] <- finparam[(l1+1):(l1+l2-1)]
+    coef1    <- cbind(coef1, finparam[1:(l1-1)])
+    coef2    <- cbind(coef2, finparam[(l1+1):(l1+l2-1)])
     pcop[[g]] <- finparam[-(1:(l1 + l2))]
-    fitval1[,g] <- exp(model.matrix.1%*%coef1[[g]])
-    fitval2[,g] <- exp(model.matrix.2%*%coef2[[g]])
+    fitval1[,g] <- exp(model.matrix.1%*%coef1[,g])
+    fitval2[,g] <- exp(model.matrix.2%*%coef2[,g])
     shape1[g] <- exp(finparam[l1])
     shape2[g] <- exp(finparam[(l1+l2)])
     if (class(coplist[[g]])=="rotExplicitCopula"){
@@ -324,6 +317,8 @@ MCGR <- function(copula,
     } else {coplist[[g]]@parameters <- pcop[[g]]}
     #coplist[[g]]@parameters <- pcop[[g]]
   }
+  colnames(coef1) <- colnames(coef2) <- names(shape1) <- names(shape2) <- paste0("g=",c(1:G))
+  names(pcop) <- sapply(coplist, class)
 
   if (gating=="C" || gating=="E"){
     finfitval <- cbind(fitval1%*%tau.current, fitval2%*%tau.current)
@@ -335,22 +330,24 @@ MCGR <- function(copula,
   f1.formula <- stats::formula(paste(namey1, as.character(f1)[3], sep="~"))
   f2.formula <- stats::formula(paste(namey2, as.character(f2)[3], sep="~"))
   if (gating == "C") {
-    gating.formula <- "C"} else if (gating == "E") {
-      gating.formula <- "E"} else {
-        gating.formula <- formula(paste("", as.character(gating.formula)[3], sep="~")) }
+    newgating <- gating.formula <- "C"} else if (gating == "E") {
+      newgating <- gating.formula <- "E"} else {
+        gating.formula <- formula(paste("", as.character(gating.formula)[3], sep="~"))
+        newgating <- "V"}
 
-  #  Calculation of output
-  result<-list(coefficients = c(beta1=coef1,
-                                shape1=list(shape1),
-                                beta2=coef2,
-                                shape2=list(shape2)),
-               gating.coef  = coef.p.new,
-               copula.param = pcop,
+  result<-list(coefficients = list(beta1=coef1,
+                                   shape1=shape1,
+                                   beta2=coef2,
+                                   shape2=shape2,
+                                   gating = coef.p.new),
+               gating       = newgating,
                copula       = coplist,
+               copula.param = pcop,
                theta        = theta.current,
                pro          = tau.current,
                z            = z.new,
                class        = classification,
+               G            = G,
                fitted.values= data.frame(finfitval),
                residuals    = residuals,
                loglike      = loglike.current,

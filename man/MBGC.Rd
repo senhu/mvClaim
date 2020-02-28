@@ -7,17 +7,17 @@
 \alias{MBGC_IC}
 \title{Mixture of bivariate gamma distributions clustering}
 \usage{
-MBGC(modelName = c("CC", "CI", "IC"), y, G, gating, data, maxit = 100,
-  tol = 1e-04, initialization = "mclust", verbose = TRUE)
+MBGC(modelName = c("CC", "CI", "IC"), y, G, gating, data, maxit = 300,
+  tol = 1e-05, initialization = "mclust", verbose = FALSE)
 
-MBGC_CC(y, G, gating, data, maxit = 200, tol = 1e-04,
-  initialization = "mclust", verbose = TRUE)
+MBGC_CC(y, G, gating, data, maxit = 300, tol = 1e-05,
+  initialization = "mclust", verbose = FALSE)
 
-MBGC_CI(y, G, gating, data, maxit = 200, tol = 1e-04,
-  initialization = "mclust", verbose = TRUE)
+MBGC_CI(y, G, gating, data, maxit = 300, tol = 1e-05,
+  initialization = "mclust", verbose = FALSE)
 
-MBGC_IC(y, G, gating, data, maxit = 200, tol = 1e-04,
-  initialization = "mclust", verbose = TRUE)
+MBGC_IC(y, G, gating, data, maxit = 300, tol = 1e-05,
+  initialization = "mclust", verbose = FALSE)
 }
 \arguments{
 \item{modelName}{A character string indicating which model to be fitted. Need to be one of "CC", "CI", "IC".}

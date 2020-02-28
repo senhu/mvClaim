@@ -32,10 +32,10 @@
 #' @export
 
 BGE <- function(data,
-                maxit = 200,
+                maxit = 300,
                 tol = 1e-5,
                 start = NULL,
-                verbose = TRUE){
+                verbose = FALSE){
   tempcall<-as.call(c(expression(BGE), list(data    = substitute(data),
                                             maxit   = maxit,
                                             tol     = tol,
@@ -82,9 +82,6 @@ BGE <- function(data,
     cat(c("starting loglikelihood:", round(loglike.current,5), "\n"))
   }
   while ( (loglike.diff >= tol) && (j <= maxit) ) {
-    #-------
-    #E step
-    #-------
     Estep.res <- BGE.Estep.function(data,
                                     alpha=c(alpha1.current, alpha2.current, alpha3.current),
                                     beta=beta.current)
@@ -95,9 +92,6 @@ BGE <- function(data,
     Expected.logx1 <- Estep.res[[3]]
     Expected.logx2 <- Estep.res[[4]]
 
-    #-------
-    #M step
-    #-------
     beta.new <- ((alpha1.current+alpha2.current+alpha3.current)*n) / sum(c(Expected.x1,Expected.x2,Expected.x3))
 
     alpha1.rootfun <- function(alpha1.var){
@@ -186,7 +180,6 @@ BGE.Estep.function <- function(data, alpha, beta){
     logs[i] <- expected.latent.res$Expected.logs
     logy1s[i] <- expected.latent.res$Expected.logy1s
     logy2s[i] <- expected.latent.res$Expected.logy2s
-    #if ( is.nan(s[i]) || is.na(s[i]) ){stop("warings3")}
   }
   return(list("s"=s, "logs"=logs, "logy1s"=logy1s, "logy2s"=logy2s))
 }

@@ -33,7 +33,9 @@ summary.BGR <- function(object, ...){
               loglike = object$loglike,
               df = object$df,
               bic = object$BIC,
-              aic = object$AIC
+              aic = object$AIC,
+              coefficients = object$coefficients,
+              formula = object$formula
   )
   class(obj) <- "summary.BGR"
   return(obj)
@@ -54,8 +56,16 @@ print.summary.BGR <- function(x, digits = getOption("digits"), ...)
   cat(paste0("BGR ", x$fullmodelName," model :"), "\n")
   cat("\n")
   #
+  for (k in 1:length(x$coefficients)){
+    tempcoef <- t(as.matrix(x$coefficients[[k]]))
+    colnames(tempcoef)<- c("(Intercept)",unlist(strsplit(as.character(x$formula[[k]])[2], " + ", fixed = TRUE)))
+    rownames(tempcoef) <- names(x$coefficients)[k]
+    print(tempcoef, digits = digits)
+  }
+  cat("\n")
+  #
   tab <- data.frame("log-likelihood" = x$loglike, "n" = x$n,
-                    "df" = x$df, "BIC" = x$bic, "AIC" = x$aic,
+                    "df" = x$df, "AIC" = x$aic, "BIC" = x$bic,
                     row.names = "", check.names = FALSE)
   print(tab, digits = digits)
   invisible(x)

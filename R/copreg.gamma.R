@@ -96,11 +96,14 @@ copreg.gamma <- function(f1,
   noparams <- length(finparam)
   AIC      <- -2*fit$value + noparams*2
   BIC      <- -2*fit$value + noparams*log(n)
+  names(coef1) <- c("(Intercept)",unlist(strsplit(as.character(f1)[3], " + ", fixed = TRUE)))
+  names(coef2) <- c("(Intercept)",unlist(strsplit(as.character(f2)[3], " + ", fixed = TRUE)))
+  shape <- c(shape1, shape2)
+  names(shape) <- c("margin1", "margin2")
 
-  result <- list(coefficients   = c(beta1 =list(coef1),
-                                    shape1=list(shape1),
-                                    beta2 =list(coef2),
-                                    shape2=list(shape2)),
+  result <- list(coefficients   = list(beta =list(margin1 = coef1,
+                                                  margin2 = coef2),
+                                       shape=shape),
                  copula.param   = pcop,
                  copula         = thecop,
                  fitted.values  = cbind(c1.fit, c2.fit),
