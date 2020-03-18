@@ -7,7 +7,7 @@
 \alias{predict_BGR_IE}
 \title{Predict Method for Bivariate Gamma Regressions}
 \usage{
-predict.BGR(object, newdata, ...)
+\method{predict}{BGR}(object, newdata, ...)
 
 predict_BGR_EE(object, newdata, ...)
 

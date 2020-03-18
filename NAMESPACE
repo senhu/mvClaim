@@ -3,6 +3,8 @@
 S3method(plot,BGR)
 S3method(plot,MBGC)
 S3method(plot,MBGR)
+S3method(predict,BGR)
+S3method(predict,MBGR)
 S3method(print,BGE)
 S3method(print,BGR)
 S3method(print,MBGC)
